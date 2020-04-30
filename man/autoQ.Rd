@@ -2,30 +2,62 @@
 % Please edit documentation in R/autoQ.R
 \name{autoQ}
 \alias{autoQ}
-\title{Read files and quantify each isotopologue}
+\title{Read files and quantify isotopologues in low- or high-resolution data}
 \usage{
-autoQ(SampleFiles = NULL, formulaTable = NULL, IsoMass = 1.003355,
-  RTwin = 5, toplot = F, ScanE = 0.1, IntE = 0.4, fit.p = 0.05)
+autoQ(
+  SampleFiles = NULL,
+  formulaTable = NULL,
+  SNR = 3,
+  minscans = 6,
+  RTwin = 5,
+  fit.p = 0.05,
+  resolution = NA,
+  minwidth = 1,
+  maxwidth = 4,
+  mzerr = 0.1,
+  massdiff = 1.003355,
+  maxppm = 5,
+  isotopes,
+  labelatom = "13C"
+)
 }
 \arguments{
-\item{SampleFiles}{List of files to be processed (see \emph{base::list.files()})}
+\item{SampleFiles}{List of mzML files to be processed (see \emph{base::list.files()})}
 
-\item{formulaTable}{Data.frame including CompoundName, Formula, mz, RT and NumAtoms (see \link{buildFormulaTable})}
+\item{formulaTable}{Dataframe including CompoundName, Formula, mz, RT and NumAtoms (see \link{buildFormulaTable})}
 
-\item{IsoMass}{Stable isotope mass difference, for C13: 1.003355}
+\item{SNR}{Minimum signal-to-noise ratio for EIC peak quantification.}
+
+\item{minscans}{Minimum number of recorded scans to use to evaluate a peak.}
 
 \item{RTwin}{Retention time window (in seconds) to extract the metabolite isotopologues}
 
-\item{ScanE}{Absolute error in which to search the Maxo scan}
+\item{fit.p}{Max linear model p-value (used to determine peak symmetry) for a peak to have its area quantified, otherwise only Maxo is returned.}
 
-\item{IntE}{Absolute error in which to integrate the area of the isotopologue. Should be larger than \emph{ScanE} and smaller than 0.5}
+\item{resolution}{Set to c(1) in the case of low-resolution data. 
+Set to a fixed average resolution value if qTOF instrument is used (for example, c(20000)). Set to 'R at MZ' as c(1e5,200) in Orbitrap instruments.}
 
-\item{fit.p}{Max linear model p-value for a peak to have its area quantified, otherwise only Maxo is returned}
+\item{minwidth}{Minimum width (in seconds) of a detected EIC peak to be considered}
+
+\item{maxwidth}{Maximum width (in seconds) of a detected EIC peak to be considered}
+
+\item{mzerr}{Symmetric (+/-) absolute mass error to consider in low-resolution data.}
+
+\item{massdiff}{Stable isotope mass difference, for C13: 1.003355, necessary for low-resolution.}
+
+\item{maxppm}{Symmetric (+/-) maximum ppm mass error to consider in high-resolution data.}
+
+\item{isotopes}{Dataframe with stable isotopes information as in  \link{enviPat::isotopes}}
+
+\item{labelatom}{Labeling atom used as in isotopes$isotope. For example, "13C".}
 }
 \value{
 A data.frame including the Area and Maxo for each file and metabolite isotopologues. If peak was missing, values are NA.
 }
 \description{
-Read each file and quantify both Area and Maxo of each metabolite isotopologues, by evaluating the RT window of each metabolite to minimize background noise
+Read each file and quantify both Area and Maxo of each metabolite isotopologues, 
+by evaluating the RT window of each metabolite to minimize background noise.
+Low resolution data requires that \emph{massdiff} and \emph{mzerr} parameters are indicated to process the data.
+High resolution data requires a limit of ppm (\emph{maxppm}) and that column \emph{Formula} from \emph{formulaTable}
+includes the molecular formula of the derivatized metabolite for accurate isotopologue mass estimation by \link{enviPat} package.
 }
-

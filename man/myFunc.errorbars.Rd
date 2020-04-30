@@ -9,4 +9,3 @@ myFunc.errorbars(x)
 \description{
 Error plotting for metBarPlot
 }
-

@@ -4,8 +4,7 @@
 \alias{meanRawPlot}
 \title{Read all scans raw data, calculate average spectrum for all files and plot}
 \usage{
-meanRawPlot(SampleFiles = NULL, formulaTable = NULL, RTwin = 5,
-  topdf = NULL)
+meanRawPlot(SampleFiles = NULL, formulaTable = NULL, RTwin = 5, topdf = NULL)
 }
 \arguments{
 \item{SampleFiles}{List of files to be plotted (see \emph{base::list.files()})}
@@ -25,4 +24,3 @@ Raw data plotting average spectra of all SampleFiles and compound for quality co
 \note{
 To plot files separately, use \link{rawPlot}
 }
-

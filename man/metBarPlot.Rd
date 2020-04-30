@@ -4,8 +4,14 @@
 \alias{metBarPlot}
 \title{Creates a PDF file with barplots per each compound}
 \usage{
-metBarPlot(x = NULL, topdf = NULL, val.to.plot = "Area", groups = c(),
-  ylabel = NULL, ...)
+metBarPlot(
+  x = NULL,
+  topdf = NULL,
+  val.to.plot = "Area",
+  groups = c(),
+  ylabel = NULL,
+  ...
+)
 }
 \arguments{
 \item{x}{The data.frame result from \link{autoQ} or \link{QTransform}}
@@ -26,4 +32,3 @@ Barplots per each compound including deviation in each isotopologue.
 \description{
 Creates a PDF file with barplots (Mean +- SD) per each compound and isotopologues using ggplot2
 }
-

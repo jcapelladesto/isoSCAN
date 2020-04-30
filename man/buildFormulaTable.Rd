@@ -17,4 +17,3 @@ formulaTable with NumAtoms column
 \description{
 Reads text file and creates \code{NumAtoms} column by obtaining carbon number from compound formula
 }
-

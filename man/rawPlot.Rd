@@ -4,8 +4,13 @@
 \alias{rawPlot}
 \title{Read all scans raw data and plot}
 \usage{
-rawPlot(SampleFiles = NULL, formulaTable = NULL, RTwin = 5,
-  topdf = NULL, plotall = F)
+rawPlot(
+  SampleFiles = NULL,
+  formulaTable = NULL,
+  RTwin = 5,
+  topdf = NULL,
+  plotall = F
+)
 }
 \arguments{
 \item{SampleFiles}{List of files to be plotted (see \emph{base::list.files()})}
@@ -25,4 +30,3 @@ Raw data plotting per each file and compound for quality control pourposes
 \note{
 It is recommended to run it for a few files only, plotting a high number of files may take time.
 }
-

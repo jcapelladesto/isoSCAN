@@ -12,7 +12,7 @@
 #' @param maxwidth Maximum width (in seconds) of a detected EIC peak to be considered
 #' @param minscans Minimum number of recorded scans to use to evaluate a peak.
 #' @param fit.p Max linear model p-value (used to determine peak symmetry) for a peak to have its area quantified, otherwise only Maxo is returned.
-#' @SNR Minimum signal-to-noise ratio for EIC peak quantification.
+#' @param SNR Minimum signal-to-noise ratio for EIC peak quantification.
 #' @param resolution Set to c(1) in the case of low-resolution data. 
 #' Set to a fixed average resolution value if qTOF instrument is used (for example, c(20000)). Set to 'R at MZ' as c(1e5,200) in Orbitrap instruments.
 #' @param massdiff Stable isotope mass difference, for C13: 1.003355, necessary for low-resolution. 

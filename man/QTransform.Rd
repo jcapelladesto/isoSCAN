@@ -19,4 +19,3 @@ A data.frame with transformed values. Can be input to \link{metBarPlot}.
 \description{
 Creates a data.frame per each compound and isotopologues calculating required transformation, prior to export or plotting
 }
-

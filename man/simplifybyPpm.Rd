@@ -7,7 +7,7 @@
 simplifybyPpm(finalres, ppm = NULL)
 }
 \arguments{
-\item{finalres}{Dataframe resulting from \emp{autoQ} function from high-resolution data.}
+\item{finalres}{Dataframe resulting from \emph{autoQ} function from high-resolution data.}
 
 \item{ppm}{Relative mass tolerance to cluster isotopologue masses}
 }

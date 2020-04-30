@@ -2,7 +2,7 @@
 #' 
 #' Simplify data.frame of quantified isotopologues by clustering isotopologue ions within a certain ppm mass difference. 
 #' These differences are caused by variation in recorded ion m/z through that may not match from sample to sample.
-#' @param finalres Dataframe resulting from \emp{autoQ} function from high-resolution data.
+#' @param finalres Dataframe resulting from \emph{autoQ} function from high-resolution data.
 #' @param ppm Relative mass tolerance to cluster isotopologue masses
 #' @return A data.frame with a reduced number of rows in which similar mass isotopologues have been collapsed into a single row.
 #' @export

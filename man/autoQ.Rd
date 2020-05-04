@@ -14,7 +14,7 @@ autoQ(
   resolution = NA,
   minwidth = 1,
   maxwidth = 4,
-  mzerr = 0.1,
+  mzerror = 0.1,
   massdiff = 1.003355,
   maxppm = 5,
   isotopes,
@@ -41,7 +41,7 @@ Set to a fixed average resolution value if qTOF instrument is used (for example,
 
 \item{maxwidth}{Maximum width (in seconds) of a detected EIC peak to be considered}
 
-\item{mzerr}{Symmetric (+/-) absolute mass error to consider in low-resolution data.}
+\item{mzerror}{Symmetric (+/-) absolute mass error to consider in low-resolution data.}
 
 \item{massdiff}{Stable isotope mass difference, for C13: 1.003355, necessary for low-resolution.}
 
@@ -57,7 +57,7 @@ A data.frame including the Area and Maxo for each file and metabolite isotopolog
 \description{
 Read each file and quantify both Area and Maxo of each metabolite isotopologues, 
 by evaluating the RT window of each metabolite to minimize background noise.
-Low resolution data requires that \emph{massdiff} and \emph{mzerr} parameters are indicated to process the data.
+Low resolution data requires that \emph{massdiff} and \emph{mzerror} parameters are indicated to process the data.
 High resolution data requires a limit of ppm (\emph{maxppm}) and that column \emph{Formula} from \emph{formulaTable}
 includes the molecular formula of the derivatized metabolite for accurate isotopologue mass estimation by \link{enviPat} package.
 }

@@ -71,7 +71,7 @@ procEIC <- function(fTi,targetmz, patfoundi, eic, minwidth, maxwidth, minscans, 
   
   colnames(isotab)[(ncol(isotab)-1):ncol(isotab)] <- paste(
     colnames(isotab)[(ncol(isotab)-1):ncol(isotab)],sampname,sep="_")
-  colnames(isotab)[1] <- "Isotopologue"
+  colnames(isotab)[1] <- "m.z"
   
   isotab <- rmOverlap(isotab)
   
@@ -180,6 +180,8 @@ isoQuant.HR <- function(SampleFiles, formulaTable, SNR, minscans , RTwin, fit.p,
   finalres <- simplifybyPpm(finalres)
   
   finalres <- do.call("rbind", finalres)
+  
+  # finalres <- 
   rownames(finalres) <- NULL
   return(finalres)
 }
@@ -207,7 +209,7 @@ isoQuant.LR <- function(SampleFiles, formulaTable, SNR, minscans , RTwin, fit.p,
     targetisos <- c(0:natom)
     targetmz <- fTiMZ+(targetisos*massdiff)
     
-    targetmz <- data.frame("m.z"=targetmz,"Isolabel"=targetisos)
+    targetmz <- data.frame("m.z"=targetmz,"Isotopologue"=targetisos)
     
     mzmin <- floor(fTiMZ-1)
     mzmax <- ceiling(max(targetmz))+1

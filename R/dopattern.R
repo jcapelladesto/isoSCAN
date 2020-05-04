@@ -92,7 +92,7 @@ doTheoPat <- function(targetpat,labelatom){
   lbli <- grep(labelatom,colnames(targetmz))
   lbli <- targetmz[,lbli]
   targetmz <- targetmz[,-c(3:ncol(targetmz))]
-  targetmz$Isolabel <- lbli
+  targetmz$Isotopologue <- lbli
   
   targetmz$ppm <- sapply(1:length(targetmz$m.z),function(z){
     m <- targetmz$m.z[z]
@@ -136,11 +136,11 @@ doConvPat <- function(targetpat,Res,labelatom){
   
   if(check_isos){
     
-    targetmz$Isolabel <- seq(0,nrow(targetmz)-1)
+    targetmz$Isotopologue <- seq(0,nrow(targetmz)-1)
     
   }else{
     
-    targetmz$Isolabel <- sapply(1:nrow(targetmz),function(z){
+    targetmz$Isotopologue <- sapply(1:nrow(targetmz),function(z){
       target <- targetmz[z,]
       ppmz <- ppmi[z]
       z <- target$m.z

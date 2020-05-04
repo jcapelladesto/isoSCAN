@@ -45,7 +45,7 @@ autoQ <- function(SampleFiles=NULL, formulaTable=NULL, SNR=3, minscans = 6, RTwi
     
     # remove ppm abundance columns ?
   }
-  
+  df$Isotopologue <- paste0("M+",finalres$Isotopologue)
   return(df)
   
 }

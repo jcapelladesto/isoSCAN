@@ -123,17 +123,17 @@ createNAdf <- function(res,HR){
   if(HR){
     temp <- lapply(res,function(r) { if(nrow(r)>0) return(r[,1:3]) else return() })
     temp <- do.call("rbind",temp)
-    ir <- data.frame("Isotopologue" =  sort(unique(temp$Isotopologue)) )
-    ir$abundance <- sapply(ir$Isotopologue, function(iso) mean(temp$abundance[which(temp$Isotopologue==iso)] ))
-    ir$Isolabel <-
-      sapply(ir$Isotopologue, function(iso) names(sort(table(temp$Isolabel[which(temp$Isotopologue==iso)]))[1]) )
+    ir <- data.frame("m.z" =  sort(unique(temp$m.z)) )
+    ir$abundance <- sapply(ir$m.z, function(iso) mean(temp$abundance[which(temp$m.z==iso)] ))
+    ir$Isotopologue <-
+      sapply(ir$m.z, function(iso) names(sort(table(temp$Isotopologue[which(temp$m.z==iso)]))[1]) )
     ir$ppm <- NA 
   }else{
     temp <- lapply(res,function(r) { if(nrow(r)>0) return(r[,1:2]) else return() })
     temp <- do.call("rbind",temp)
-    ir <- data.frame("Isotopologue" =  sort(unique(temp$Isotopologue)) )
-    ir$Isolabel <-
-      sapply(ir$Isotopologue, function(iso) names(sort(table(temp$Isolabel[which(temp$Isotopologue==iso)]))[1]) )
+    ir <- data.frame("m.z" =  sort(unique(temp$m.z)) )
+    ir$Isotopologue <-
+      sapply(ir$m.z, function(iso) names(sort(table(temp$Isotopologue[which(temp$m.z==iso)]))[1]) )
   }
   
   ir$maxo <- NA
@@ -176,9 +176,9 @@ prepRes <- function(res,ir,rows,SampleFiles,HR){
       # temp2 <- ir[which(!(ir$Isotopologue%in%temp1$Isotopologue)),,drop=F]
       temp2 <- ir
       colnames(temp2) <- colnames(temp1)
-      temp2 <- temp2[-sapply(temp1$Isotopologue,function(x) which.min(abs(temp2$Isotopologue-x))),]
+      temp2 <- temp2[-sapply(temp1$m.z,function(x) which.min(abs(temp2$m.z-x))),]
       temp1 <- rbind(temp1,temp2)
-      temp1 <- temp1[order(as.character(temp1$Isotopologue)),,drop=F]
+      temp1 <- temp1[order(as.character(temp1$m.z)),,drop=F]
     }
     if(r!=1){
       if(HR){

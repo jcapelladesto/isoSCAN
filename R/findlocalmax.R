@@ -130,7 +130,7 @@ peakSim <- function(int,minscans,fit.p){
   
   int <- int[which(int>0)] # 
   
-  if(length(int)<minscans){return(1)}
+  if(length(int)<minscans){return(c(-1))}
   
   maxidx <- which(int==max(int))[1]
   
@@ -197,9 +197,9 @@ findIsos <- function(fTi, targetmz,patfoundi,eic,minwidth,maxwidth,minscans,SNR,
         peakSim(int[which(rt>=res$RTmin[r] & rt<=res$RTmax[r])],
                 minscans,fit.p))
       
-      if (any(check_sim==1)) {
-        res <- res[-which(check_sim==1), ]
-        check_sim <- check_sim[-which(check_sim==1)]
+      if (any(check_sim==c(-1))) {
+        res <- res[-which(check_sim==c(-1)), ]
+        check_sim <- check_sim[-which(check_sim==c(-1))]
       }
       
       if (any(check_sim>=fit.p)) {
@@ -211,12 +211,7 @@ findIsos <- function(fTi, targetmz,patfoundi,eic,minwidth,maxwidth,minscans,SNR,
       if(nrow(res)==0){return()}
       
 
-      if(nrow(res) > 1) {
-        check_RTdev <- (res$maxoRT-fTi$RT)/fTi$RT
-        res <- res[which(check_RTdev==min(check_RTdev)), ]
-      }
-      
-      if(nrow(res) > 1) {
+      if(nrow(res) > 1) { # A or B?
         check_RTp <-
           apply(res, 1, function(x) {
             x["RTmin"] < fTi$RT & x["RTmax"] > fTi$RT
@@ -225,6 +220,12 @@ findIsos <- function(fTi, targetmz,patfoundi,eic,minwidth,maxwidth,minscans,SNR,
           res <- res[-which(!check_RTp), ]
         }
       }
+      
+      if(nrow(res) > 1) { # A or B?
+        check_RTdev <- abs(res$maxoRT-fTi$RT)/fTi$RT
+        res <- res[which(check_RTdev==min(check_RTdev)), ]
+      }
+      
       
       if(nrow(res)==1) {
         targetmz2 <- targetmz[i, ]

@@ -29,10 +29,10 @@ autoQ <- function(SampleFiles=NULL, formulaTable=NULL, SNR=3, minscans = 6, RTwi
                   maxppm=5, isotopes, labelatom="13C"){
   
   
-  if(  maxwidth > RTwin){stop("Argument RTwin must be larger than maxwidth (check Help)",call. = help("autoQ"))}
-  if(is.na(resolution)){stop("Please indicate the resolution of the data  as indicated (check Help)",call. = help("autoQ"))}
+  if(maxwidth > RTwin){stop("Argument RTwin must be larger than maxwidth (check Help)",call. = help("autoQ"))}
+  if(is.na(resolution[1])){stop("Please indicate the resolution of the data  as indicated (check Help)",call. = help("autoQ"))}
   
-  if(resolution==1){
+  if(resolution[1]==1){
     #nominal
     HR <- F
     df <- isoQuant.LR(SampleFiles, formulaTable, SNR, minscans , RTwin, fit.p,

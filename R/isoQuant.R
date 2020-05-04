@@ -40,10 +40,10 @@ searchEIC.HR <- function(targetmz,eic,ppm){
 }
 
 
-searchEIC.LR <- function(targetmz,eic,mzerr){
+searchEIC.LR <- function(targetmz,eic,mzerror){
   patppmi <- lapply(targetmz$m.z,function(x){ abs(eic$basePeakMZ-x) })
   patfoundi <- lapply(patppmi,function(x){ 
-    idx <- which(x<mzerr)
+    idx <- which(x<mzerror)
     return(idx)
   })
   patppmi <- sapply(patfoundi,length)
@@ -77,9 +77,6 @@ procEIC <- function(fTi,targetmz, patfoundi, eic, minwidth, maxwidth, minscans, 
   
   return(isotab)
 }
-
-
-
 
 
 isoQuant.HR <- function(SampleFiles, formulaTable, SNR, minscans , RTwin, fit.p,
@@ -189,7 +186,7 @@ isoQuant.HR <- function(SampleFiles, formulaTable, SNR, minscans , RTwin, fit.p,
 
 
 isoQuant.LR <- function(SampleFiles, formulaTable, SNR, minscans , RTwin, fit.p,
-                        mzerr, massdiff, minwidth, maxwidth, HR){
+                        mzerror, massdiff, minwidth, maxwidth, HR){
   
   # preload sample headers
   hdlist <- lapply(1:length(SampleFiles),function(s){
@@ -207,7 +204,6 @@ isoQuant.LR <- function(SampleFiles, formulaTable, SNR, minscans , RTwin, fit.p,
     fTiRT <- fTi$RT
     fTiRTRan <- c(fTiRT-RTwin,fTiRT+RTwin)
     natom <- fTi$NumAtoms
-    #massdiff <- 1.003356
     targetisos <- c(0:natom)
     targetmz <- fTiMZ+(targetisos*massdiff)
     
@@ -221,7 +217,7 @@ isoQuant.LR <- function(SampleFiles, formulaTable, SNR, minscans , RTwin, fit.p,
       myscans <- h$acquisitionNum[which(h$retentionTime>fTiRTRan[1] & h$retentionTime<fTiRTRan[2])]
       eic <- extractEIC(SampleFiles[s],h,myscans,mzmin,mzmax)
       # Isolabel
-      eicL <- searchEIC.LR(targetmz,eic,mzerr)
+      eicL <- searchEIC.LR(targetmz,eic,mzerror)
       targetmz <- eicL$A
       patfoundi <- eicL$B
       # sapply(patfoundi,function(i) plot(eic[i,3:2]))

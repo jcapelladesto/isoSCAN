@@ -83,7 +83,7 @@ checkRows <- function(ppm_df,ppm_values){
       rws>=quantile(rws,0.25)   &
       abundiff>=quantile(abundiff,0.25)  ) # was 0.33
   
-  if(length(dfidx)>1){
+  if(length(dfidx)>1 & any(m0found)){
     m0found <- m0found[dfidx]
     dfidx <- dfidx[which(m0found)]
   }

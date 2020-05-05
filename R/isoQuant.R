@@ -2,7 +2,8 @@ extractEIC <- function(myfile,h,myscans,mzmin,mzmax){
   aa <- mzR::openMSfile(myfile)
   p <- mzR::peaks(aa,scans = myscans )
   eic <- lapply(1:length(p),function(x){
-    rt <- h[which(h$acquisitionNum==myscans[x]),"retentionTime"]
+    # rt <- h[which(h$acquisitionNum==myscans[x]),"retentionTime"]
+    rt <- h[myscans[x],"retentionTime"]
     mp <- p[[x]]
     mpidx <- which(mp[,1]>mzmin &  mp[,1]<mzmax)
     mp <- mp[mpidx,,drop=F]
@@ -131,7 +132,8 @@ isoQuant.HR <- function(SampleFiles, formulaTable, SNR, minscans , RTwin, fit.p,
     res <- lapply(1:length(SampleFiles),function(s){
       
       h <- hdlist[[s]]
-      myscans <- h$acquisitionNum[which(h$retentionTime>fTiRTRan[1] & h$retentionTime<fTiRTRan[2])]
+      # myscans <- h$acquisitionNum[which(h$retentionTime>fTiRTRan[1] & h$retentionTime<fTiRTRan[2])]
+      myscans <- which(h$retentionTime>fTiRTRan[1] & h$retentionTime<fTiRTRan[2])
       eic <- extractEIC(SampleFiles[s],h,myscans,mzmin,mzmax)
       
       ppm_df <- lapply(list(targetmz.conv,targetmz.theo),function(x){
@@ -181,7 +183,6 @@ isoQuant.HR <- function(SampleFiles, formulaTable, SNR, minscans , RTwin, fit.p,
   
   finalres <- do.call("rbind", finalres)
   
-  # finalres <- 
   rownames(finalres) <- NULL
   return(finalres)
 }
@@ -216,7 +217,9 @@ isoQuant.LR <- function(SampleFiles, formulaTable, SNR, minscans , RTwin, fit.p,
     
     res <- lapply(1:length(SampleFiles),function(s){
       h <- hdlist[[s]]
-      myscans <- h$acquisitionNum[which(h$retentionTime>fTiRTRan[1] & h$retentionTime<fTiRTRan[2])]
+      # myscans <- h$acquisitionNum[which(h$retentionTime>fTiRTRan[1] & h$retentionTime<fTiRTRan[2])]
+      # myscans <- h$acquisitionNum[which(h$retentionTime>fTiRTRan[1] & h$retentionTime<fTiRTRan[2])]
+      myscans <- which(h$retentionTime>fTiRTRan[1] & h$retentionTime<fTiRTRan[2])
       eic <- extractEIC(SampleFiles[s],h,myscans,mzmin,mzmax)
       # Isolabel
       eicL <- searchEIC.LR(targetmz,eic,mzerror)

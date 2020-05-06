@@ -3,7 +3,7 @@ Title: Automatic Integration for GC-CI-MS Isotope Labeling Data
 Version: 0.9
 Author: Jordi Capellades
 Maintainer: Jordi Capellades <j.capellades.to@gmail.com>
-Date: 2017-05-25
+Date: 2020-05-01
 Description: isoSCAN automatically integrates peaks in both Low- and High-Resolution GC-CI-MS Isotope Labeling Data
 Imports: mzR, ggplot2, reshape2, enviPat
 Depends: R (>= 3.5.0), Rcpp

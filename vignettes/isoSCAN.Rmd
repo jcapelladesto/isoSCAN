@@ -16,76 +16,128 @@ knitr::opts_chunk$set(collapse = TRUE, purl = FALSE)
 ## Introduction
 This vignette contains a basic walkthrough of the functionalities of the `isoSCAN` package.
 
-This package requires a specific input format for the _compound table_, in which we __must__ find:
+This package requires a specific input format for the _compound table_ to be used in _autoQ_ _formulaTable_ argument, in which we __must__ find:
 
-* __CompoundName__
+* __CompoundName__ is the name of the compound or metabolite quantified
 
-* __mz__ of the derivate monoisotopic peak
+* __mz__ of the monoisotopic ion. The other isotopologue ions are calculated by _autoQ_ function
 
-* __RT__ in seconds
+* __RT__ retention time value in seconds
+
+* __Formula__ of the compound. This formula must match the derivatized _Formula_ including derivatization modifications.
 
 * __NumAtoms__ determining the number of compounds to be quantified
 
 * Other columns will be ignored
 
-The package includes the `buildFormulaTable` function to extract the __NumAtoms__ value from a column named __Formula__.
+The rest of the functions are used for processing the raw data for either quantification or plotting. The package currently contains the following functions.
 
-The rest of the functions are used for processing the raw data for either quantification or plotting. The package currently contains the following functions:
+* Quantifcation:
 
-* `autoQ`
+    * `autoQ`
 
-* `metBarPlot`
+##### TODO: Complete function list
+<!-- * Value transformation -->
 
-* `QTransform`
+<!--     * `QTransform` -->
 
-* `rawPlot`
+<!-- * Plotting  -->
 
-* `meanRawPlot`
+<!--     * `rawPlot` -->
 
+<!--     * `meanRawPlot` -->
 
-## Creating the FormulaTable
-Before starting with the file processing, we need to load the _compound table_ into the _FormulaTable_ data frame. This can be done either with `read.table` or `read.csv` functions. Make sure that the file contains it contains the columns as listed above.
+<!--     * `metBarPlot` -->
+
+## Creating the formulaTable
+Before starting with the file processing, we need to load the _compound table_ as the _formulaTable_ data frame. This can be done either with `read.table` or `read.csv` functions. Make sure that the file contains it contains the columns as listed above.
+
+The package includes examples for both Low- and High-Resolution.
 
 ```{r,message = FALSE,warning = FALSE}
 library(isoSCAN)
-formulaTable <- read.table(file=system.file("extdata/formulatable_example.txt", package="isoSCAN"),header=T,sep="\t")
+data("formulaTables")
 
-formulaTable$CompoundName <- factor(formulaTable$compound,levels=unique(formulaTable$compound)) # in factor format
-formulaTable$RT <- formulaTable$tR*60 # retention time was in minutes
-formulaTable$mz <- formulaTable$m.z
+# Low-Resolution (e.g. nominal mass accuracy)
+formulaTable_lowres <- formulaTables[which(formulaTables$Instrument=="Quarupole"),]
+
+formulaTable_lowres
 ```
 
-This table contains a column called `Formula`, we will now extract the number of atoms of the compound using `buildFormulaTable`.
 
 ```{r}
-formulaTable$Formula[1:5]
-formulaTable <- buildFormulaTable(formulaTable)
-formulaTable$NumAtoms[1:5]
+# High-Resolution (Orbitrap, or qTOF)
+formulaTable_orbi <- formulaTables[which(formulaTables$Instrument=="Orbitrap"),]
+
+formulaTable_orbi
 ```
 
-We now have our formulaTable ready to start the file processing.
 
-```{r}
-formulaTable[1:5,c("CompoundName","NumAtoms", "mz","RT")]
-```
+## Processing mz(X)ML files
+First, you will have to transform the raw data from vendor format into mz(X)ML format using Proteowizard MSconvert (or similar tools), so they can be read by the `mzR` R package.
+* In the case of Low-resolution. Transform the data mantaining profile format.
+* In the case of High-resolution, please use centroiding (e.g. _peakPicking true_ in msconvert)
+Then, we need to locate the folder in which these files are found and list them in a vector.
 
-## Processing mzXML files
-First, the user will have to transform the raw data from vendor format into mz(X)ML format using Proteowizard (or similar tools), so they can be read by the `mzR` R package.
-Then, we need to locate the folder in which the mzXML files are found and list them in a vector.
-
-```{r}
+```{r,eval=FALSE}
 #run this: setwd("./mydatafolder")
-lf <- list.files(pattern=".mzXML")
+SampleFiles  <- list.files(pattern=".mz(X)?ML")
+```
+
+This package also includes example mzML data files to be used as an example:
+```{r,eval=FALSE}
+# Low-resolution files
+SampleFiles_lowres <- list.files(system.file("extdata",package = "isoSCAN"),full.names = T,pattern = "lowres")
+
+#High-resolution files
+SampleFiles_orbi <- list.files(system.file("extdata",package = "isoSCAN"),full.names = T,pattern = "orbi")
 ```
 
 Now we can call `autoQ` function that will process the files and look for the isotopologues for each compound found in the `formulaTable`.
+Additionally, other parameters need to be indicated as stated in _help(autoQ)_. This parameters refer to peak width and number of scans recorded, together with signal-to-noise ratio and mass error.
+
+In the case of low-resolution data. Please remember to use them in _Profile_ format as it eases the process of peak finding. 
 
 ```{r,eval=FALSE}
-integrations <- autoQ(SampleFiles=lf, formulaTable=formulaTable, IsoMass = 1.003355, RTwin = 5, toplot = F, ScanE = 0.1, IntE= 0.4, fit.p = 0.05)
+# Low-Resolution
+integrations <- autoQ(SampleFiles=SampleFiles_lowres,
+                      formulaTable=formulaTable_lowres,
+                      resolution = 1,  # low resoltuion
+                      minscans = 6,
+                      SNR = 3,
+                      mzerror = 0.2,
+                      RTwin = 5,
+                      maxwidth = 1,
+                      minwidth = 4,
+                      massdiff = 1.003355)
 ```
-This function processes each file independently, looking for "good" peaks and obtaining both the area and max intensity scan (Maxo) for each isotopologue, if the area cannot be calculated, due to noise or peak shape, then only the Maxo is returned.
+
+
+###### TODO: explain enviPat
+
+```{r,eval=FALSE}
+data(isotopes, package="enviPat")
+isotopes[isotopes$isotope=="13C",] # both rows required
+
+# High-Resolution
+integrations <- autoQ(SampleFiles=SampleFiles_orbi,
+                      formulaTable=formulaTable_orbi,
+                      resolution = c(1e5,200),  # orbi resolution parameters
+                      minscans = 6,
+                      SNR = 3,
+                      maxppm=5,
+                      RTwin = 5,
+                      maxwidth = 1,
+                      minwidth = 4,
+                      isotopes, 
+                      labelatom="13C")
+```
+
+This processes each file independently, looking for "good-shape" peaks and obtaining both the area and max intensity scan (Maxo) for each isotopologue, if the area cannot be calculated (due to noise or peak shape) then only the Maxo is returned.
 
 Once finished, we can plot them or transform the values for exportation. 
+
+###### TODO: Adapt plotting to new version 0.1 >> 0.9
 
 ## Plotting results and value transformation
 The `metBarPlot` function is designed to plot values in a barplot including standard deviation error bars. The arguments for value are the following:
@@ -110,7 +162,7 @@ metBarPlot(x=integrations, groups = mygroups, val.to.plot="Area",
 
 * _ylabel_ The text that should be shown in the Y axis (i.e. Intensity, Area). Otherwise, _val.to.plot_ value will be used. 
 
-`metBarPlot` can also digest the data frame produced by `Q2Transform`. Read the function help for further information. 
+`metBarPlot` can also digest the data frame produced by `QTransform`. Read the function help for further information. 
 
 ## Extra: Raw data plotting
 `rawPlot` and `meanRawPlot` functions should be used for quality control purposes. They are useful to check for moving peaks, noisy spots or saturated peaks.

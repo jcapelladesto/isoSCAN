@@ -1,12 +1,12 @@
 Package: isoSCAN
-Title: Automatic Integration for QqQ Isotope Labeling Data
-Version: 0.1
+Title: Automatic Integration for GC-CI-MS Isotope Labeling Data
+Version: 0.9
 Author: Jordi Capellades
 Maintainer: Jordi Capellades <j.capellades.to@gmail.com>
 Date: 2017-05-25
-Description: Automatic Integration for QqQ Isotope Labeling Data.
-Imports: mzR, ggplot2, reshape2
-Depends: R (>= 3.0.0), Rcpp
+Description: isoSCAN automatically integrates peaks in both Low- and High-Resolution GC-CI-MS Isotope Labeling Data
+Imports: mzR, ggplot2, reshape2, enviPat
+Depends: R (>= 3.5.0), Rcpp
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

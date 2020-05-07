@@ -21,6 +21,7 @@
 #' @param isotopes Dataframe with stable isotopes information as in  \link{enviPat::isotopes}
 #' @param labelatom Labeling atom used as in isotopes$isotope. For example, "13C".
 #' @return A data.frame including the Area and Maxo for each file and metabolite isotopologues. If peak was missing, values are NA.
+#' @details In the case of high-resolution and additional column indicating the estimated mass accuracy error (in ppm) per each isotopologue and sample is included.
 #' @export
 
 autoQ <- function(SampleFiles=NULL, formulaTable=NULL, SNR=3, minscans = 6, RTwin = 5, fit.p = 0.05,
@@ -30,6 +31,7 @@ autoQ <- function(SampleFiles=NULL, formulaTable=NULL, SNR=3, minscans = 6, RTwi
   
   
   if(maxwidth > RTwin){stop("Argument RTwin must be larger than maxwidth (check Help)",call. = help("autoQ"))}
+  if(minwidth >= maxwidth){stop("Argument maxwidth must be larger than minwidth (check Help)",call. = help("autoQ"))}
   if(is.na(resolution[1])){stop("Please indicate the resolution of the data  as indicated (check Help)",call. = help("autoQ"))}
   
   if(resolution[1]==1){

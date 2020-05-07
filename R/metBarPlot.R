@@ -12,23 +12,24 @@
 
 # label for they yaxis , delete label decision alg
 metBarPlot <- 
-	function(x=NULL, topdf=NULL, val.to.plot = "Area", groups = c(), ylabel = NULL, ...)
+	function(autoQres=NULL, topdf=NULL, val.to.plot = "Area", groups = c(), ylabel = NULL, ...)
 {
 	try(dev.off(),silent=T)
-	FinalInt <- x
 	sleepval <- 0.1
 	if(is.null(ylabel)){
 		warning("'ylabel' value is NULL. Using 'val.to.plot' value as default label for y axis.")
 		ylabel <- val.to.plot 
 	}
 	if(!is.null(topdf)){pdf(topdf,...);sleepval <- sleepval-0.1}
-	plotapply <- lapply(levels(FinalInt$CompoundName),function(x){
-		cat(c("Plotting compoundName:",x,"\n"))
-		selcol2 <- c(1:2,grep(val.to.plot,colnames(FinalInt)))
-		pos <- which(FinalInt$CompoundName==x)
-		plotdata <- FinalInt[pos,selcol2]
+	plotapply <- lapply(levels(autoQres$CompoundName),function(x){
+		message(cat(c("Plotting compoundName:",x)))
+		selcol2 <- grep(val.to.plot,colnames(autoQres))
+		selcol2 <- colnames(autoQres)[selcol2]
+		selcol2 <- c("CompoundName","Isotopologue",selcol2)
+		pos <- which(autoQres$CompoundName==x)
+		plotdata <- autoQres[pos,selcol2]
 		
-		suppressMessages(resmat <- melt(plotdata,id.vars=c("CompoundName","Isotopologue")))
+		suppressMessages(resmat <- reshape2::melt(plotdata,id.vars=c("CompoundName","Isotopologue")))
     resmat$variable <- rep(groups,each=nrow(plotdata))
 		resmat$variable <- as.factor(resmat$variable)
 		if(all(is.na(resmat$value))){

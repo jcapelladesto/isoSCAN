@@ -57,10 +57,10 @@ searchEIC.LR <- function(targetmz,eic,mzerror){
   return(list("A"=targetmz,"B"=patfoundi))
 }
 
-procEIC <- function(fTi,targetmz, patfoundi, eic, minwidth, maxwidth, minscans, SNR, fit.p, s){
+procEIC <- function(fTi,targetmz, patfoundi, eic, minwidth, maxwidth, minscans, SNR, fit.p, SampleFiles, s){
   
   if(nrow(targetmz)>0){
-    isotab <- findIsos(fTi,targetmz, patfoundi, eic, minwidth, maxwidth, minscans, SNR, fit.p, s) 
+    isotab <- findIsos(fTi,targetmz, patfoundi, eic, minwidth, maxwidth, minscans, SNR, fit.p, SampleFiles, s) 
   }else{
     return(data.frame())
   }
@@ -141,7 +141,7 @@ isoQuant.HR <- function(SampleFiles, formulaTable, SNR, minscans , RTwin, fit.p,
           eicL <- searchEIC.HR(x,eic,ppm)
           targetmz <- eicL$A
           patfoundi <- eicL$B
-          procEIC(fTi,targetmz, patfoundi, eic, minwidth, maxwidth, minscans, SNR, fit.p, s)
+          procEIC(fTi,targetmz, patfoundi, eic, minwidth, maxwidth, minscans, SNR, fit.p,SampleFiles, s)
           
         })
       })
@@ -227,7 +227,7 @@ isoQuant.LR <- function(SampleFiles, formulaTable, SNR, minscans , RTwin, fit.p,
       patfoundi <- eicL$B
       # sapply(patfoundi,function(i) plot(eic[i,3:2]))
       
-      r <- procEIC(fTi,targetmz, patfoundi, eic, minwidth, maxwidth, minscans, SNR, fit.p, s)
+      r <- procEIC(fTi,targetmz, patfoundi, eic, minwidth, maxwidth, minscans, SNR, fit.p,SampleFiles, s)
       
       return(r)
     })

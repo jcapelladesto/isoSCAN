@@ -177,7 +177,7 @@ peakSim <- function(int,minscans,fit.p){
 }
 
 findIsos <- function(fTi, targetmz,patfoundi,eic,minwidth,maxwidth,minscans,SNR,fit.p,
-                     s) {
+                     SampleFiles,s) {
   
   res <- lapply(1:length(patfoundi), function(i) {
     iix <- patfoundi[[i]]

@@ -14,50 +14,56 @@ rawPlot <-
 		try(dev.off(),silent=T)
 		for (fn in SampleFiles){
 			# add progress information?
-			aa <- openMSfile(fn)
-			h <- header(aa)
-			p <- peaks(aa)
+			oMS <- mzR::openMSfile(fn)
+			h <- mzR::header(oMS)
+			p <- mzR::peaks(oMS)
 			h <- lapply(1:length(p),function(x){
-				rt <- h[which(h$acquisitionNum==x),"retentionTime"]
-				res <- cbind(p[[x]],rep(x=rt,times=nrow(p[[x]])),rep(x=x,times=nrow(p[[x]])))
+				rt <- h$retentionTime[x]
+				res <- cbind(p[[x]],rep(x=rt,times=nrow(p[[x]])))
 				return(res)
 			})
 			h <- do.call("rbind",h)
 			h <- as.data.frame(h)
-			colnames(h) <- c("basePeakMZ","basePeakIntensity","retentionTime","ScanNum")
-			fn  <- gsub("\\..*$","",fn)
-			fn  <- gsub(pattern="[[:punct:]]",replacement="_",fn)
+			colnames(h) <- c("basePeakMZ","basePeakIntensity","retentionTime")
+			fn  <- rmfileExt(fn,ext.regexp = "\\.mz(x)?ML")
 			if(!is.null(topdf)) {pdf(file=paste0(topdf,fn,".pdf"))}
 			for (i in 1:nrow(formulaTable)){
-				vr <- formulaTable[i,]
-				vrMZ  <-  vr$mz
-				vrRT <- vr$RT
-				vrRTRan <- c(vrRT-RTwin,vrRT+RTwin)
-				vrMZRan <- c(vrMZ-1,vrMZ+vr$NumAtoms+1)
+			  fTi <- formulaTable[i,]
+			  message(paste0(c("Processing: ",as.character(fTi$CompoundName))))
+			  fTiMZ  <-  fTi$mz
+			  fTiRT <- fTi$RT
+			  fTiRTRan <- c(fTiRT-RTwin,fTiRT+RTwin)
+			  fTiFormula <- as.character(fTi$Formula)
+			  natom <- fTi$NumAtoms
+			  fTiMZRan <- c(fTiMZ-1,fTiMZ+(natom+1))
 				
 				if (plotall){
-					myPlot <- ggplot(data=h,aes(x=basePeakMZ, y= retentionTime, color = basePeakIntensity))+
+					myPlot <- ggplot(data=h,aes(x=basePeakMZ, y= retentionTime, color = log10(basePeakIntensity)))+
 						ggtitle("All scans")+
 						scale_colour_gradientn(colours = terrain.colors(5))+
-						geom_point()
+						geom_point()+
+					  theme(legend.title = NULL)
+				
 				}
 				
-				msdata <- h[which(h$retentionTime>vrRTRan[1] &
-														h$retentionTime<vrRTRan[2] &
-														h$basePeakMZ>vrMZRan[1] & 
-														h$basePeakMZ<vrMZRan[2]	),c("retentionTime","basePeakMZ","basePeakIntensity") ]
+				msdata <- h[which(h$retentionTime>fTiRTRan[1] &
+														h$retentionTime<fTiRTRan[2] &
+														h$basePeakMZ>fTiMZRan[1] & 
+														h$basePeakMZ<fTiMZRan[2]	),c("retentionTime","basePeakMZ","basePeakIntensity") ]
 				
 				myPlot <- ggplot(data=msdata,
-												 aes(x=basePeakMZ, y= retentionTime, color = basePeakIntensity))+ggtitle(vr$CompoundName)+
-					geom_hline(yintercept=vrRT,color="red")+
+												 aes(x=basePeakMZ, y= retentionTime, color = basePeakIntensity))+
+				  ggtitle(fTi$CompoundName)+
+					geom_hline(yintercept=fTiRT,color="red")+
 					scale_colour_gradientn(colours = terrain.colors(5))+
-					geom_point(size=5)+ylim(vrRTRan)
+					geom_point(size=4,alpha=0.8)+ylim(fTiRTRan)
 						
 				tryCatch({print(myPlot);Sys.sleep(0)}, error=function(e){
 					myPlot <- ggplot(data=msdata,
-													 aes(x=basePeakMZ, y= retentionTime))+ggtitle(vr$CompoundName)+
-						geom_hline(yintercept=vrRT,color="red")+
-						geom_point(size=5)+ylim(vrRTRan)
+													 aes(x=basePeakMZ, y= retentionTime))+
+					  ggtitle(fTi$CompoundName)+
+						geom_hline(yintercept=fTiRT,color="red")+
+						geom_point(size=4,alpha=0.8)+ylim(fTiRTRan)
 					
 					print(myPlot);Sys.sleep(0)
 				})

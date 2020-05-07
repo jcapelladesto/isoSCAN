@@ -16,7 +16,7 @@ knitr::opts_chunk$set(collapse = TRUE, purl = FALSE)
 ## Introduction
 This vignette contains a basic walkthrough of the functionalities of the `isoSCAN` package.
 
-This package requires a specific input format for the _compound table_ to be used in _autoQ_ _formulaTable_ argument, in which we __must__ find:
+This package requires a specific input format for the _compound table_ to be used in _autoQ_ _formulaTable_ argument, in which we __must__ find different columns in no specific order:
 
 * __CompoundName__ is the name of the compound or metabolite quantified
 
@@ -59,7 +59,7 @@ library(isoSCAN)
 data("formulaTables")
 
 # Low-Resolution (e.g. nominal mass accuracy)
-formulaTable_lowres <- formulaTables[which(formulaTables$Instrument=="Quarupole"),]
+formulaTable_lowres <- formulaTables[which(formulaTables$Instrument=="Quadrupole"),]
 
 formulaTable_lowres
 ```
@@ -102,14 +102,17 @@ In the case of low-resolution data. Please remember to use them in _Profile_ for
 # Low-Resolution
 integrations <- autoQ(SampleFiles=SampleFiles_lowres,
                       formulaTable=formulaTable_lowres,
-                      resolution = 1,  # low resoltuion
+                      resolution = 1,  # low resolution
                       minscans = 6,
                       SNR = 3,
-                      mzerror = 0.2,
+                      mzerror = 0.1,
                       RTwin = 5,
-                      maxwidth = 1,
-                      minwidth = 4,
+                      maxwidth = 4,
+                      minwidth = 1,
                       massdiff = 1.003355)
+
+
+head(integrations)
 ```
 
 
@@ -127,9 +130,9 @@ integrations <- autoQ(SampleFiles=SampleFiles_orbi,
                       SNR = 3,
                       maxppm=5,
                       RTwin = 5,
-                      maxwidth = 1,
-                      minwidth = 4,
-                      isotopes, 
+                      maxwidth = 4,
+                      minwidth = 1,
+                      isotopes=isotopes, 
                       labelatom="13C")
 ```
 
@@ -144,12 +147,13 @@ The `metBarPlot` function is designed to plot values in a barplot including stan
 
 * _groups_ Sample groups. This should be a vector with the groups of experiments, matching the same order in `list.files(pattern=".mzXML")`. This vector can be created using `gsub` function and others. See the example:
 
+* _val.to.plot_ Values to use for plotting. Either "Area" or "Maxo".
+
 ```{r,eval=FALSE}
-mygroups <- lf
-mygroups <- gsub("_..?mzXML$","",mygroups) # here we delete all characters after the last "_" until the end of the sample name (check regular expressions in R)
+mygroups <- isoSCAN:::rmfileExt(SampleFiles_orbi,"\\.mzML")
+mygroups <- gsub(".*_","",mygroups)
 ```
 
-* _val.to.plot_ Values to use for plotting. Either "Area" or "Maxo".
 
 ```{r,eval=FALSE}
 metBarPlot(x=integrations, groups = mygroups, val.to.plot="Area")

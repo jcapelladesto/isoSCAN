@@ -61,3 +61,6 @@ Low resolution data requires that \emph{massdiff} and \emph{mzerror} parameters 
 High resolution data requires a limit of ppm (\emph{maxppm}) and that column \emph{Formula} from \emph{formulaTable}
 includes the molecular formula of the derivatized metabolite for accurate isotopologue mass estimation by \link{enviPat} package.
 }
+\details{
+In the case of high-resolution and additional column indicating the estimated mass accuracy error (in ppm) per each isotopologue and sample is included.
+}

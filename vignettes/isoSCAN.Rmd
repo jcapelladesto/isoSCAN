@@ -134,6 +134,8 @@ integrations <- autoQ(SampleFiles=SampleFiles_orbi,
                       minwidth = 1,
                       isotopes=isotopes, 
                       labelatom="13C")
+
+head(integrations)
 ```
 
 This processes each file independently, looking for "good-shape" peaks and obtaining both the area and max intensity scan (Maxo) for each isotopologue, if the area cannot be calculated (due to noise or peak shape) then only the Maxo is returned.
@@ -156,15 +158,21 @@ mygroups <- gsub(".*_","",mygroups)
 
 
 ```{r,eval=FALSE}
-metBarPlot(x=integrations, groups = mygroups, val.to.plot="Area")
+metBarPlot(autoQres=integrations, groups = mygroups, val.to.plot="area")
 #if you want to save the plots to a file:
-metBarPlot(x=integrations, groups = mygroups, val.to.plot="Area",
+metBarPlot(autoQres=integrations, groups = mygroups, val.to.plot="area",
 					 topdf="./metBarPlot_results.pdf",height=10,width=18,pointsize=16)
 #modify height, width and pointsize accordingly to fit your output size
 
 ```
 
 * _ylabel_ The text that should be shown in the Y axis (i.e. Intensity, Area). Otherwise, _val.to.plot_ value will be used. 
+
+```{r}
+sum_intg <- sumIsotopologues(integrations)
+metBarPlot(autoQres=sum_intg, groups = mygroups, val.to.plot="area")
+```
+
 
 `metBarPlot` can also digest the data frame produced by `QTransform`. Read the function help for further information. 
 
@@ -174,14 +182,16 @@ The first function will print a "spectra heatmap", m/z and retention time in the
 
 ```{r, eval=FALSE}
 # Example plot from first file and first compound
-rawPlot(SampleFiles=lf[1],formulaTable=formulaTable[1,],RTwin=5)
+rawPlot(SampleFiles=SampleFiles_orbi[1],formulaTable=formulaTable_orbi[1,],RTwin=5)
 ```
 
 While the `rawPlot` function will run through each file and plot the raw spectra for all compounds in a single pdf file, `meanRawPlot` will calculate the average spectra for all files and generate a single plot for each compound.
 
 ```{r, eval=FALSE}
 # Example plot for the first compound, note that now we use ALL files
-meanRawPlot(SampleFiles=lf,formulaTable=formulaTable[1,],RTwin=5)
+meanRawPlot(SampleFiles=SampleFiles_lowres[c(1,3)],
+            formulaTable=formulaTable_lowres[1:2,], 
+            RTwin=5)
 ```
 
 Both functions contain the `topdf` argument, that is encouraged to be used in order to save the files into _PDF format_ instead of being shown in the R plotting default device. In the case of `meanRawPlot` indicate the name of the output PDF file desired (`topdf=/plot_folder/mean_raw_spectra.pdf`), whereas in the case of `rawPlot` should be used as: `topdf="C:/Users/User/Desktop/plot_folder` and all plots generated will be saved into *plot_folder* mantaining the sample name for the pdf file name.

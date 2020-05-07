@@ -14,33 +14,33 @@ meanRawPlot <- function(SampleFiles=NULL,formulaTable=NULL,RTwin=5,topdf=NULL){
 message("Reading raw data")
 rawdat <- lapply(SampleFiles,function(fn){
 	# add progress information?
-	aa <- openMSfile(fn)
-	h <- header(aa)
-	p <- peaks(aa)
-	h <- lapply(1:length(p),function(x){
-		rt <- h[which(h$acquisitionNum==x),"retentionTime"]
-		res <- cbind(p[[x]],rep(x=rt,times=nrow(p[[x]])),rep(x=x,times=nrow(p[[x]])))
-		return(res)
-	})
+  oMS <- mzR::openMSfile(fn)
+  h <- mzR::header(oMS)
+  p <- mzR::peaks(oMS)
+  h <- lapply(1:length(p),function(x){
+    rt <- h$retentionTime[x]
+    res <- cbind(p[[x]],rep(x=rt,times=nrow(p[[x]])))
+    return(res)
+  })
 	h <- do.call("rbind",h)
 	h <- as.data.frame(h)
-	colnames(h) <- c("basePeakMZ","basePeakIntensity","retentionTime","ScanNum")
+	colnames(h) <- c("basePeakMZ","basePeakIntensity","retentionTime")
 	return(h)
 })
 message("Plotting spectra")
 if(!is.null(topdf)) {pdf(file=topdf)}
 for (i in 1:nrow(formulaTable)){ 
-	vr <- formulaTable[i,]
-	vrMZ  <-  vr$mz
-	vrRT <- vr$RT
-	vrRTRan <- c(vrRT-RTwin,vrRT+RTwin)
-	vrMZRan <- c(vrMZ-1,vrMZ+vr$NumAtoms+1) 
+	fTi <- formulaTable[i,]
+	fTiMZ  <-  fTi$mz
+	fTiRT <- fTi$RT
+	fTiRTRan <- c(fTiRT-RTwin,fTiRT+RTwin)
+	fTiMZRan <- c(fTiMZ-1,fTiMZ+fTi$NumAtoms+1) 
 	Metdata <- lapply(1:length(SampleFiles),function(j){ # read all files and get data.frame  
 		msdata <- rawdat[[j]]
-		msdata <- msdata[which(msdata $retentionTime>vrRTRan[1] &
-													 	msdata $retentionTime<vrRTRan[2] &
-													 	msdata $basePeakMZ>vrMZRan[1] & 
-													 	msdata $basePeakMZ<vrMZRan[2]	),
+		msdata <- msdata[which(msdata $retentionTime>fTiRTRan[1] &
+													 	msdata $retentionTime<fTiRTRan[2] &
+													 	msdata $basePeakMZ>fTiMZRan[1] & 
+													 	msdata $basePeakMZ<fTiMZRan[2]	),
 										 c("retentionTime","basePeakMZ","basePeakIntensity") ]
 		msdata$sample <- j
 		return(msdata)
@@ -84,6 +84,7 @@ for (i in 1:nrow(formulaTable)){
 	newtimes <- sapply(timesList,mean) # mean rt corrected
 	# rtwin to calculate mean intensity
 	timesList <- lapply(timesList,function(x) return(c(min(x),max(x)))) 
+	
 	Metdata2 <- sapply(timesList,function(rt){  # calculate mean intensity
 		sapply(sort(unique(Metdata$basePeakMZ)),function(mz){
 			idx <- which(Metdata$basePeakMZ==mz 
@@ -114,16 +115,16 @@ for (i in 1:nrow(formulaTable)){
 	
 	myPlot <- ggplot(data=Metdata2,
 									 aes(x=basePeakMZ, y= retentionTime, color = basePeakIntensity))+
-		ggtitle(vr$CompoundName)+
-		geom_hline(yintercept=vrRT,color="red")+
+		ggtitle(fTi$CompoundName)+
+		geom_hline(yintercept=fTiRT,color="red")+
 		scale_colour_gradientn(colours = terrain.colors(5))+
-		geom_point(size=5)+ylim(vrRTRan)
+		geom_point(size=5)+ylim(fTiRTRan)
 	
 	tryCatch({print(myPlot);Sys.sleep(0)}, error=function(e){
 		myPlot <- ggplot(data=Metdata2,
-										 aes(x=basePeakMZ, y= retentionTime))+ggtitle(vr$CompoundName)+
-			geom_hline(yintercept=vrRT,color="red")+
-			geom_point(size=5)+ylim(vrRTRan)
+										 aes(x=basePeakMZ, y= retentionTime))+ggtitle(fTi$CompoundName)+
+			geom_hline(yintercept=fTiRT,color="red")+
+			geom_point(size=5)+ylim(fTiRTRan)
 		
 		print(myPlot);Sys.sleep(0)
 	})

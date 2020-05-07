@@ -71,5 +71,5 @@ rawPlot <-
 			}
 			if(!is.null(topdf)) {	dev.off()}
 		}
-		return()
+		# return()
 	}

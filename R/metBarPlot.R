@@ -1,7 +1,7 @@
 #' Creates a PDF file with barplots per each compound
 #' 
 #' Creates a PDF file with barplots (Mean +- SD) per each compound and isotopologues using ggplot2
-#' @param x The data.frame result from \link{autoQ} or \link{QTransform}
+#' @param autoQres The data.frame result from \link{autoQ} or \link{QTransform}
 #' @param topdf File directory where the plot should be saved. If \code{NULL} plots will be sent to R plotting device
 #' @param val.to.plot Values to use for plotting. Either "Area" or "Maxo". If values were transformed with \code{Qtransform}, indicate the value used for transformation
 #' @param groups Sample groups. A vector of length equal to number of samples that will match the samples order
@@ -10,9 +10,8 @@
 #' @return Barplots per each compound including deviation in each isotopologue.
 #' @export
 
-# label for they yaxis , delete label decision alg
 metBarPlot <- 
-	function(autoQres=NULL, topdf=NULL, val.to.plot = "Area", groups = c(), ylabel = NULL, ...)
+	function(autoQres=NULL, topdf=NULL, val.to.plot = "area", groups = c(), ylabel = NULL, ...)
 {
 	try(dev.off(),silent=T)
 	sleepval <- 0.1
@@ -22,7 +21,7 @@ metBarPlot <-
 	}
 	if(!is.null(topdf)){pdf(topdf,...);sleepval <- sleepval-0.1}
 	plotapply <- lapply(levels(autoQres$CompoundName),function(x){
-		message(cat(c("Plotting compoundName:",x)))
+		# message(cat(c("Plotting compoundName:",x,"\n")))
 		selcol2 <- grep(val.to.plot,colnames(autoQres))
 		selcol2 <- colnames(autoQres)[selcol2]
 		selcol2 <- c("CompoundName","Isotopologue",selcol2)
@@ -48,7 +47,8 @@ metBarPlot <-
 															 panel.grid.minor=element_blank(),
 															 panel.grid.minor.x=element_blank(),
 															 panel.grid.major.x=element_blank())+
-			ggtitle(x)+ylab(ylabel)
+			ggtitle(x)+
+		  ylab(ylabel)
 		
 
 		if (all(resmat$value<=1)) {
@@ -56,7 +56,7 @@ metBarPlot <-
 		}
 		suppressWarnings(print(Myplot));Sys.sleep(sleepval)
 
-		return()
+		# return()
 	})
 	if(!is.null(topdf)){dev.off()}
 }

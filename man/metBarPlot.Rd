@@ -5,16 +5,16 @@
 \title{Creates a PDF file with barplots per each compound}
 \usage{
 metBarPlot(
-  x = NULL,
+  autoQres = NULL,
   topdf = NULL,
-  val.to.plot = "Area",
+  val.to.plot = "area",
   groups = c(),
   ylabel = NULL,
   ...
 )
 }
 \arguments{
-\item{x}{The data.frame result from \link{autoQ} or \link{QTransform}}
+\item{autoQres}{The data.frame result from \link{autoQ} or \link{QTransform}}
 
 \item{topdf}{File directory where the plot should be saved. If \code{NULL} plots will be sent to R plotting device}
 

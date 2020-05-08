@@ -1,5 +1,5 @@
 # isoSCAN
-R Package to automatically process GC-QQQ-CI-MS data for stable isotope labelling experiments
+R Package to automatically process GC-CI-MS data for stable isotope labelling experiments
 
 
 To Install from R console:

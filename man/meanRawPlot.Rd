@@ -4,14 +4,25 @@
 \alias{meanRawPlot}
 \title{Read all scans raw data, calculate average spectrum for all files and plot}
 \usage{
-meanRawPlot(SampleFiles = NULL, formulaTable = NULL, RTwin = 5, topdf = NULL)
+meanRawPlot(
+  SampleFiles = NULL,
+  formulaTable = NULL,
+  RTwin = 5,
+  ppm = 1,
+  rm.bg = FALSE,
+  topdf = NULL
+)
 }
 \arguments{
 \item{SampleFiles}{List of files to be plotted (see \emph{base::list.files()})}
 
 \item{formulaTable}{Data.frame including CompoundName, Formula, mz, RT and NumAtoms (see \link{buildFormulaTable})}
 
-\item{RTwin}{Retention time window (in seconds) to extract the metabolite isotopologues}
+\item{RTwin}{Retention time window (in seconds) to extract the metabolite isotopologues (default=5)}
+
+\item{ppm}{Expected realtive mass accuracy if high-resolution data is used (default=1)}
+
+\item{rm.bg}{Remove background noise intensity (default=FALSE)}
 
 \item{topdf}{File directory where the plots will be saved in pdf format. One pdf file per mzML file in Sampledir}
 }

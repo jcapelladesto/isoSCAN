@@ -8,6 +8,7 @@
 
 sumIsotopologues <- function(autoQres){
   ppmi <- grep("ppm",colnames(autoQres))
+  if(length(ppmi)==0){stop("sumIsotopologues only works for High-resolution autoQ results")}
   autoQres <- autoQres[,-ppmi]
   autoQres$m.z <- NULL
   autoQres$abundance <- NULL

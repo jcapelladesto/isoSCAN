@@ -56,14 +56,16 @@ rawPlot <-
 				  ggtitle(fTi$CompoundName)+
 					geom_hline(yintercept=fTiRT,color="red")+
 					scale_colour_gradientn(colours = terrain.colors(5))+
-					geom_point(size=4,alpha=0.8)+ylim(fTiRTRan)
+					geom_point(size=4)+
+				  ylim(fTiRTRan)
 						
 				tryCatch({print(myPlot);Sys.sleep(0)}, error=function(e){
 					myPlot <- ggplot(data=msdata,
 													 aes(x=basePeakMZ, y= retentionTime))+
 					  ggtitle(fTi$CompoundName)+
 						geom_hline(yintercept=fTiRT,color="red")+
-						geom_point(size=4,alpha=0.8)+ylim(fTiRTRan)
+						geom_point(size=4)+
+					  ylim(fTiRTRan)
 					
 					print(myPlot);Sys.sleep(0)
 				})

@@ -28,7 +28,7 @@ This package requires a specific input format for the _compound table_ to be use
 
 * __NumAtoms__ determining the number of compounds to be quantified
 
-* Other columns will be ignored
+* Other columns will be ignored by the function
 
 The rest of the functions are used for processing the raw data for either quantification or plotting. The package currently contains the following functions.
 
@@ -36,18 +36,19 @@ The rest of the functions are used for processing the raw data for either quanti
 
     * `autoQ`
 
-##### TODO: Complete function list
-<!-- * Value transformation -->
+* Data transformation
 
-<!--     * `QTransform` -->
+    * `QTransform`
+    
+    * `sumIsotopologues`
+    
+* Plotting
 
-<!-- * Plotting  -->
+    * `rawPlot`
 
-<!--     * `rawPlot` -->
+    * `meanRawPlot`
 
-<!--     * `meanRawPlot` -->
-
-<!--     * `metBarPlot` -->
+    * `metBarPlot`
 
 ## Creating the formulaTable
 Before starting with the file processing, we need to load the _compound table_ as the _formulaTable_ data frame. This can be done either with `read.table` or `read.csv` functions. Make sure that the file contains it contains the columns as listed above.

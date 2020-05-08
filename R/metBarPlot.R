@@ -37,7 +37,7 @@ metBarPlot <-
 		}
 		Myplot <- ggplot(data=resmat,
 										 aes(x=Isotopologue,y=value, colour = Isotopologue, 
-										 		fill=Isotopologue,group=variable))+
+										 		fill=Isotopologue, group=variable))+
 			stat_summary(fun.data="myFunc.errorbars",geom="bar")+
 			stat_summary(fun.data ="myFunc.errorbars",
 									 geom = "errorbar", width = 0.5,size = 0.7)+
@@ -52,7 +52,8 @@ metBarPlot <-
 		
 
 		if (all(resmat$value<=1)) {
-			try(Myplot <- Myplot+scale_y_continuous(breaks=seq(0,max(resmat$value,na.rm=T),0.1)),silent=T)
+			try(Myplot <- Myplot+
+			      scale_y_continuous(breaks=seq(0,max(resmat$value,na.rm=T),0.1)),silent=T)
 		}
 		suppressWarnings(print(Myplot));Sys.sleep(sleepval)
 

@@ -69,3 +69,14 @@ iso.generator <- function(formula,atom,nisos,isotopes){
   res <- c(formula,res)
   return(res)
 }
+
+countDecimalPlaces <- function(x) { 
+  #from stackoverflow fvfaleiro
+  if ((x %% 1) != 0) {
+    strs <- strsplit(as.character(format(x, scientific = F)), "\\.")
+    n <- nchar(strs[[1]][2])
+  } else {
+    n <- 0
+  }
+  return(n) 
+}

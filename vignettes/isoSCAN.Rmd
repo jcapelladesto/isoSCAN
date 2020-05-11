@@ -40,6 +40,8 @@ The rest of the functions are used for processing the raw data for either quanti
 
     * `QTransform`
     
+    * `simplifybyPpm`
+        
     * `sumIsotopologues`
     
 * Plotting
@@ -86,12 +88,14 @@ SampleFiles  <- list.files(pattern=".mz(X)?ML")
 ```
 
 This package also includes example mzML data files to be used as an example:
-```{r,eval=FALSE}
+```{r,eval=T}
 # Low-resolution files
-SampleFiles_lowres <- list.files(system.file("extdata",package = "isoSCAN"),full.names = T,pattern = "lowres")
+SampleFiles_lowres <- list.files(system.file("extdata",package = "isoSCAN"),
+                                 full.names = T,pattern = "lowres")
 
 #High-resolution files
-SampleFiles_orbi <- list.files(system.file("extdata",package = "isoSCAN"),full.names = T,pattern = "orbi")
+SampleFiles_orbi <- list.files(system.file("extdata",package = "isoSCAN"),
+                               full.names = T,pattern = "orbi")
 ```
 
 Now we can call `autoQ` function that will process the files and look for the isotopologues for each compound found in the `formulaTable`.
@@ -99,7 +103,7 @@ Additionally, other parameters need to be indicated as stated in _help(autoQ)_. 
 
 In the case of low-resolution data. Please remember to use them in _Profile_ format as it eases the process of peak finding. 
 
-```{r,eval=FALSE}
+```{r,message=F,echo=F}
 # Low-Resolution
 integrations <- autoQ(SampleFiles=SampleFiles_lowres,
                       formulaTable=formulaTable_lowres,
@@ -113,15 +117,21 @@ integrations <- autoQ(SampleFiles=SampleFiles_lowres,
                       massdiff = 1.003355)
 
 
+
+```
+```{r}
 head(integrations)
 ```
 
 
 ###### TODO: explain enviPat
-
-```{r,eval=FALSE}
+```{r}
 data(isotopes, package="enviPat")
 isotopes[isotopes$isotope=="13C",] # both rows required
+```
+
+
+```{r,message=F,echo=F}
 
 # High-Resolution
 integrations <- autoQ(SampleFiles=SampleFiles_orbi,
@@ -136,14 +146,15 @@ integrations <- autoQ(SampleFiles=SampleFiles_orbi,
                       isotopes=isotopes, 
                       labelatom="13C")
 
+```
+
+```{r}
 head(integrations)
 ```
 
 This processes each file independently, looking for "good-shape" peaks and obtaining both the area and max intensity scan (Maxo) for each isotopologue, if the area cannot be calculated (due to noise or peak shape) then only the Maxo is returned.
 
 Once finished, we can plot them or transform the values for exportation. 
-
-###### TODO: Adapt plotting to new version 0.1 >> 0.9
 
 ## Plotting results and value transformation
 The `metBarPlot` function is designed to plot values in a barplot including standard deviation error bars. The arguments for value are the following:
@@ -152,7 +163,9 @@ The `metBarPlot` function is designed to plot values in a barplot including stan
 
 * _val.to.plot_ Values to use for plotting. Either "Area" or "Maxo".
 
-```{r,eval=FALSE}
+* _ylabel_ The text that should be shown in the Y axis (i.e. Intensity, Area). Otherwise, _val.to.plot_ value will be used. 
+
+```{r,eval=T}
 mygroups <- isoSCAN:::rmfileExt(SampleFiles_orbi,"\\.mzML")
 mygroups <- gsub(".*_","",mygroups)
 ```
@@ -160,20 +173,26 @@ mygroups <- gsub(".*_","",mygroups)
 
 ```{r,eval=FALSE}
 metBarPlot(autoQres=integrations, groups = mygroups, val.to.plot="area")
+```
+
+```{r}
+integrations <- sumIsotopologues(integrations) #only for high-res
+metBarPlot(autoQres=integrations[which(integrations$CompoundName=="Ala"),], 
+           groups = mygroups, val.to.plot="area")
+```
+
+```{r,eval=F}
 #if you want to save the plots to a file:
 metBarPlot(autoQres=integrations, groups = mygroups, val.to.plot="area",
 					 topdf="./metBarPlot_results.pdf",height=10,width=18,pointsize=16)
 #modify height, width and pointsize accordingly to fit your output size
-
 ```
 
-* _ylabel_ The text that should be shown in the Y axis (i.e. Intensity, Area). Otherwise, _val.to.plot_ value will be used. 
 
-```{r}
+```{r, eval=FALSE}
 sum_intg <- sumIsotopologues(integrations)
 metBarPlot(autoQres=sum_intg, groups = mygroups, val.to.plot="area")
 ```
-
 
 `metBarPlot` can also digest the data frame produced by `QTransform`. Read the function help for further information. 
 

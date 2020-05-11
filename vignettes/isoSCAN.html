@@ -12,7 +12,7 @@
 
 <meta name="author" content="Jordi Capellades" />
 
-<meta name="date" content="2020-05-06" />
+<meta name="date" content="2020-05-08" />
 
 <title>isoSCAN Package Vignette</title>
 
@@ -95,21 +95,21 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">isoSCAN Package Vignette</h1>
 <h4 class="author">Jordi Capellades</h4>
-<h4 class="date">2020-05-06</h4>
+<h4 class="date">2020-05-08</h4>
 
 
 
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
 <p>This vignette contains a basic walkthrough of the functionalities of the <code>isoSCAN</code> package.</p>
-<p>This package requires a specific input format for the <em>compound table</em> to be used in <em>autoQ</em> <em>formulaTable</em> argument, in which we <strong>must</strong> find:</p>
+<p>This package requires a specific input format for the <em>compound table</em> to be used in <em>autoQ</em> <em>formulaTable</em> argument, in which we <strong>must</strong> find different columns in no specific order:</p>
 <ul>
 <li><p><strong>CompoundName</strong> is the name of the compound or metabolite quantified</p></li>
 <li><p><strong>mz</strong> of the monoisotopic ion. The other isotopologue ions are calculated by <em>autoQ</em> function</p></li>
 <li><p><strong>RT</strong> retention time value in seconds</p></li>
 <li><p><strong>Formula</strong> of the compound. This formula must match the derivatized <em>Formula</em> including derivatization modifications.</p></li>
 <li><p><strong>NumAtoms</strong> determining the number of compounds to be quantified</p></li>
-<li><p>Other columns will be ignored</p></li>
+<li><p>Other columns will be ignored by the function</p></li>
 </ul>
 <p>The rest of the functions are used for processing the raw data for either quantification or plotting. The package currently contains the following functions.</p>
 <ul>
@@ -117,16 +117,19 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <ul>
 <li><code>autoQ</code></li>
 </ul></li>
+<li><p>Data transformation</p>
+<ul>
+<li><p><code>QTransform</code></p></li>
+<li><p><code>simplifybyPpm</code></p></li>
+<li><p><code>sumIsotopologues</code></p></li>
+</ul></li>
+<li><p>Plotting</p>
+<ul>
+<li><p><code>rawPlot</code></p></li>
+<li><p><code>meanRawPlot</code></p></li>
+<li><p><code>metBarPlot</code></p></li>
+</ul></li>
 </ul>
-<div id="todo-complete-function-list" class="section level5">
-<h5>TODO: Complete function list</h5>
-<!-- * Value transformation -->
-<!--     * `QTransform` -->
-<!-- * Plotting  -->
-<!--     * `rawPlot` -->
-<!--     * `meanRawPlot` -->
-<!--     * `metBarPlot` -->
-</div>
 </div>
 <div id="creating-the-formulatable" class="section level2">
 <h2>Creating the formulaTable</h2>
@@ -136,26 +139,30 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <span class="kw">data</span>(<span class="st">&quot;formulaTables&quot;</span>)
 
 <span class="co"># Low-Resolution (e.g. nominal mass accuracy)</span>
-formulaTable_lowres &lt;-<span class="st"> </span>formulaTables[<span class="kw">which</span>(formulaTables<span class="op">$</span>Instrument<span class="op">==</span><span class="st">&quot;Quarupole&quot;</span>),]
+formulaTable_lowres &lt;-<span class="st"> </span>formulaTables[<span class="kw">which</span>(formulaTables<span class="op">$</span>Instrument<span class="op">==</span><span class="st">&quot;Quadrupole&quot;</span>),]
 
 formulaTable_lowres
-## [1] CompoundName RT           mz           Formula      NumAtoms    
-## [6] Instrument  
-## &lt;0 rows&gt; (or 0-length row.names)</code></pre></div>
+##   CompoundName    RT    mz  Formula NumAtoms Instrument
+## 1         ILeu 357.0 276.0 C6H13NO2        6 Quadrupole
+## 3          Leu 373.2 276.0 C6H13NO2        6 Quadrupole
+## 4          Gly 382.2 292.0  C2H5NO2        2 Quadrupole
+## 5    Succinate 384.0 263.1   C4H4O4        4 Quadrupole
+## 6     Fumarate 406.8 261.1   C4H2O4        4 Quadrupole
+## 7          Ala 418.2 306.0  C3H7NO2        3 Quadrupole
+## 8          Ser 421.8 322.0  C3H7NO3        3 Quadrupole</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># High-Resolution (Orbitrap, or qTOF)</span>
 formulaTable_orbi &lt;-<span class="st"> </span>formulaTables[<span class="kw">which</span>(formulaTables<span class="op">$</span>Instrument<span class="op">==</span><span class="st">&quot;Orbitrap&quot;</span>),]
 
 formulaTable_orbi
-##          CompoundName    RT       mz      Formula NumAtoms Instrument
-## 51                Val 354.6 262.1653 C11H28NO2Si2        5   Orbitrap
-## 11 Glycerol (13C3) IS 396.0 312.1833  C12H33O3Si3        3   Orbitrap
-## 7                ILeu 396.6 276.1809 C12H30NO2Si2        6   Orbitrap
-## 8                 Leu 411.6 276.1809 C12H30NO2Si2        6   Orbitrap
-## 9                 Gly 421.8 292.1579 C11H30NO2Si3        2   Orbitrap
-## 6           Succinate 426.6 263.1129  C10H23O4Si2        4   Orbitrap
-## 41           Fumarate 453.0 261.0973  C10H21O4Si2        4   Orbitrap
-## 13                Ser 459.0 322.1684 C12H32NO3Si3        3   Orbitrap
-## 10                Ala 460.2 306.1735 C12H32NO2Si3        3   Orbitrap</code></pre></div>
+##    CompoundName    RT       mz      Formula NumAtoms Instrument
+## 9           Val 354.6 262.1653 C11H28NO2Si2        5   Orbitrap
+## 11         ILeu 396.6 276.1809 C12H30NO2Si2        6   Orbitrap
+## 12          Leu 411.6 276.1809 C12H30NO2Si2        6   Orbitrap
+## 13          Gly 421.8 292.1579 C11H30NO2Si3        2   Orbitrap
+## 14    Succinate 426.6 263.1129  C10H23O4Si2        4   Orbitrap
+## 15     Fumarate 453.0 261.0973  C10H21O4Si2        4   Orbitrap
+## 16          Ser 459.0 322.1684 C12H32NO3Si3        3   Orbitrap
+## 17          Ala 460.2 306.1735 C12H32NO2Si3        3   Orbitrap</code></pre></div>
 </div>
 <div id="processing-mzxml-files" class="section level2">
 <h2>Processing mz(X)ML files</h2>
@@ -164,76 +171,117 @@ formulaTable_orbi
 SampleFiles  &lt;-<span class="st"> </span><span class="kw">list.files</span>(<span class="dt">pattern=</span><span class="st">&quot;.mz(X)?ML&quot;</span>)</code></pre></div>
 <p>This package also includes example mzML data files to be used as an example:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Low-resolution files</span>
-SampleFiles_lowres &lt;-<span class="st"> </span><span class="kw">list.files</span>(<span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>,<span class="dt">package =</span> <span class="st">&quot;isoSCAN&quot;</span>),<span class="dt">full.names =</span> T,<span class="dt">pattern =</span> <span class="st">&quot;lowres&quot;</span>)
+SampleFiles_lowres &lt;-<span class="st"> </span><span class="kw">list.files</span>(<span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>,<span class="dt">package =</span> <span class="st">&quot;isoSCAN&quot;</span>),
+                                 <span class="dt">full.names =</span> T,<span class="dt">pattern =</span> <span class="st">&quot;lowres&quot;</span>)
 
 <span class="co">#High-resolution files</span>
-SampleFiles_orbi &lt;-<span class="st"> </span><span class="kw">list.files</span>(<span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>,<span class="dt">package =</span> <span class="st">&quot;isoSCAN&quot;</span>),<span class="dt">full.names =</span> T,<span class="dt">pattern =</span> <span class="st">&quot;orbi&quot;</span>)</code></pre></div>
+SampleFiles_orbi &lt;-<span class="st"> </span><span class="kw">list.files</span>(<span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>,<span class="dt">package =</span> <span class="st">&quot;isoSCAN&quot;</span>),
+                               <span class="dt">full.names =</span> T,<span class="dt">pattern =</span> <span class="st">&quot;orbi&quot;</span>)</code></pre></div>
 <p>Now we can call <code>autoQ</code> function that will process the files and look for the isotopologues for each compound found in the <code>formulaTable</code>. Additionally, other parameters need to be indicated as stated in <em>help(autoQ)</em>. This parameters refer to peak width and number of scans recorded, together with signal-to-noise ratio and mass error.</p>
 <p>In the case of low-resolution data. Please remember to use them in <em>Profile</em> format as it eases the process of peak finding.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Low-Resolution</span>
-integrations &lt;-<span class="st"> </span><span class="kw">autoQ</span>(<span class="dt">SampleFiles=</span>SampleFiles_lowres,
-                      <span class="dt">formulaTable=</span>formulaTable_lowres,
-                      <span class="dt">resolution =</span> <span class="dv">1</span>,  <span class="co"># low resoltuion</span>
-                      <span class="dt">minscans =</span> <span class="dv">6</span>,
-                      <span class="dt">SNR =</span> <span class="dv">3</span>,
-                      <span class="dt">mzerror =</span> <span class="fl">0.2</span>,
-                      <span class="dt">RTwin =</span> <span class="dv">5</span>,
-                      <span class="dt">maxwidth =</span> <span class="dv">1</span>,
-                      <span class="dt">minwidth =</span> <span class="dv">4</span>,
-                      <span class="dt">massdiff =</span> <span class="fl">1.003355</span>)</code></pre></div>
-<div id="todo-explain-envipat" class="section level7">
-<p>TODO: explain enviPat</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(integrations)
+##   CompoundName      m.z Isotopologue maxo_lowres1_C12 area_lowres1_C12
+## 1         ILeu 276.0000          M+0        27803.354         235102.9
+## 2         ILeu 277.0034          M+1         7990.107         107147.1
+## 3         ILeu 278.0067          M+2               NA               NA
+## 4         ILeu 279.0101          M+3               NA               NA
+## 5         ILeu 280.0134          M+4               NA               NA
+## 6         ILeu 281.0168          M+5               NA               NA
+##   maxo_lowres1_C13 area_lowres1_C13 maxo_lowres2_C12 area_lowres2_C12
+## 1        63631.645        566743.25       44112.3359         373584.5
+## 2        17535.680        277193.54       12711.3623         185009.9
+## 3         9129.646        126876.92               NA               NA
+## 4         2112.309         24435.29               NA               NA
+## 5         1026.878               NA         889.4612               NA
+## 6               NA               NA         747.2433               NA
+##   maxo_lowres2_C13 area_lowres2_C13
+## 1        63551.746         546198.4
+## 2        16982.432         276727.2
+## 3         6969.124         122360.4
+## 4         1641.441               NA
+## 5         1131.994               NA
+## 6               NA               NA</code></pre></div>
+<div id="todo-explain-envipat" class="section level6">
+<h6>TODO: explain enviPat</h6>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(isotopes, <span class="dt">package=</span><span class="st">&quot;enviPat&quot;</span>)
 isotopes[isotopes<span class="op">$</span>isotope<span class="op">==</span><span class="st">&quot;13C&quot;</span>,] <span class="co"># both rows required</span>
-
-<span class="co"># High-Resolution</span>
-integrations &lt;-<span class="st"> </span><span class="kw">autoQ</span>(<span class="dt">SampleFiles=</span>SampleFiles_orbi,
-                      <span class="dt">formulaTable=</span>formulaTable_orbi,
-                      <span class="dt">resolution =</span> <span class="kw">c</span>(<span class="fl">1e5</span>,<span class="dv">200</span>),  <span class="co"># orbi resolution parameters</span>
-                      <span class="dt">minscans =</span> <span class="dv">6</span>,
-                      <span class="dt">SNR =</span> <span class="dv">3</span>,
-                      <span class="dt">maxppm=</span><span class="dv">5</span>,
-                      <span class="dt">RTwin =</span> <span class="dv">5</span>,
-                      <span class="dt">maxwidth =</span> <span class="dv">1</span>,
-                      <span class="dt">minwidth =</span> <span class="dv">4</span>,
-                      isotopes, 
-                      <span class="dt">labelatom=</span><span class="st">&quot;13C&quot;</span>)</code></pre></div>
+##     element isotope     mass abundance ratioC
+## 11        C     13C 13.00335    0.0107      0
+## 297   [13]C     13C 13.00336    1.0000      0</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(integrations)
+##   CompoundName         m.z      abundance Isotopologue          ppm
+## 1          Val 262.1653085 100.0000000000          M+0 0.4853617602
+## 2          Val 263.1648767  10.1601552758          M+0 2.7041712978
+## 3          Val 263.1686635  11.8973011220          M+1           NA
+## 4          Val 264.1621522   6.7054856164          M+0 0.7398822616
+## 5          Val 264.1682317   1.2087842676          M+1 3.3946624208
+## 6          Val 265.1655072   0.7977718155          M+1 2.6080860825
+##   maxo_orbi1_C12 area_orbi1_C12          ppm maxo_orbi1_C13 area_orbi1_C13
+## 1  8976119.00000  60551262.4098 0.4458851174  32598202.0000  231863093.322
+## 2  1770118.37500   4522556.9660 2.6461894377   6580297.5000             NA
+## 3             NA             NA           NA             NA             NA
+## 4   594159.75000   3854748.8445 0.8554081909   2121596.0000   15272910.780
+## 5    95426.71875    561197.8758 2.8170460675    318370.8438    2182675.815
+## 6    59326.93750    334466.2617 2.6080860825    212550.7969    1438073.499
+##            ppm maxo_orbi2_C12 area_orbi2_C12          ppm maxo_orbi2_C13
+## 1 0.4458851174 1419617.625000             NA 0.3689559005  9450046.00000
+## 2           NA             NA             NA 2.8411111442  1751672.25000
+## 3 1.0163440538   71981.531250             NA 0.9003820022   126260.34375
+## 4 0.7398822616   91571.453125             NA 0.5776296465   625612.06250
+## 5           NA             NA             NA 3.3369007854    94064.78906
+## 6 0.9392985861    8817.168945             NA 3.0684412539    62637.26562
+##   area_orbi2_C13
+## 1  65156489.5397
+## 2             NA
+## 3             NA
+## 4   4162402.1243
+## 5    603723.1553
+## 6    366316.0257</code></pre></div>
 <p>This processes each file independently, looking for “good-shape” peaks and obtaining both the area and max intensity scan (Maxo) for each isotopologue, if the area cannot be calculated (due to noise or peak shape) then only the Maxo is returned.</p>
 <p>Once finished, we can plot them or transform the values for exportation.</p>
-</div>
-<div id="todo-adapt-plotting-to-new-version-0.1-0.9" class="section level7">
-<p>TODO: Adapt plotting to new version 0.1 &gt;&gt; 0.9</p>
 </div>
 </div>
 <div id="plotting-results-and-value-transformation" class="section level2">
 <h2>Plotting results and value transformation</h2>
 <p>The <code>metBarPlot</code> function is designed to plot values in a barplot including standard deviation error bars. The arguments for value are the following:</p>
 <ul>
-<li><em>groups</em> Sample groups. This should be a vector with the groups of experiments, matching the same order in <code>list.files(pattern=&quot;.mzXML&quot;)</code>. This vector can be created using <code>gsub</code> function and others. See the example:</li>
+<li><p><em>groups</em> Sample groups. This should be a vector with the groups of experiments, matching the same order in <code>list.files(pattern=&quot;.mzXML&quot;)</code>. This vector can be created using <code>gsub</code> function and others. See the example:</p></li>
+<li><p><em>val.to.plot</em> Values to use for plotting. Either “Area” or “Maxo”.</p></li>
+<li><p><em>ylabel</em> The text that should be shown in the Y axis (i.e. Intensity, Area). Otherwise, <em>val.to.plot</em> value will be used.</p></li>
 </ul>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mygroups &lt;-<span class="st"> </span>lf
-mygroups &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;_..?mzXML$&quot;</span>,<span class="st">&quot;&quot;</span>,mygroups) <span class="co"># here we delete all characters after the last &quot;_&quot; until the end of the sample name (check regular expressions in R)</span></code></pre></div>
-<ul>
-<li><em>val.to.plot</em> Values to use for plotting. Either “Area” or “Maxo”.</li>
-</ul>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">metBarPlot</span>(<span class="dt">x=</span>integrations, <span class="dt">groups =</span> mygroups, <span class="dt">val.to.plot=</span><span class="st">&quot;Area&quot;</span>)
-<span class="co">#if you want to save the plots to a file:</span>
-<span class="kw">metBarPlot</span>(<span class="dt">x=</span>integrations, <span class="dt">groups =</span> mygroups, <span class="dt">val.to.plot=</span><span class="st">&quot;Area&quot;</span>,
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mygroups &lt;-<span class="st"> </span>isoSCAN<span class="op">:::</span><span class="kw">rmfileExt</span>(SampleFiles_orbi,<span class="st">&quot;</span><span class="ch">\\</span><span class="st">.mzML&quot;</span>)
+mygroups &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;.*_&quot;</span>,<span class="st">&quot;&quot;</span>,mygroups)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">metBarPlot</span>(<span class="dt">autoQres=</span>integrations, <span class="dt">groups =</span> mygroups, <span class="dt">val.to.plot=</span><span class="st">&quot;area&quot;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">metBarPlot</span>(<span class="dt">autoQres=</span>integrations[<span class="kw">which</span>(integrations<span class="op">$</span>CompoundName<span class="op">==</span><span class="st">&quot;Ala&quot;</span>),], 
+           <span class="dt">groups =</span> mygroups, <span class="dt">val.to.plot=</span><span class="st">&quot;area&quot;</span>)
+## Warning in metBarPlot(autoQres = integrations[which(integrations$CompoundName
+## == : 'ylabel' value is NULL. Using 'val.to.plot' value as default label for y
+## axis.
+## Not quantified
+## Not quantified
+## Not quantified
+## Not quantified
+## Not quantified
+## Not quantified
+## Not quantified</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#if you want to save the plots to a file:</span>
+<span class="kw">metBarPlot</span>(<span class="dt">autoQres=</span>integrations, <span class="dt">groups =</span> mygroups, <span class="dt">val.to.plot=</span><span class="st">&quot;area&quot;</span>,
                      <span class="dt">topdf=</span><span class="st">&quot;./metBarPlot_results.pdf&quot;</span>,<span class="dt">height=</span><span class="dv">10</span>,<span class="dt">width=</span><span class="dv">18</span>,<span class="dt">pointsize=</span><span class="dv">16</span>)
 <span class="co">#modify height, width and pointsize accordingly to fit your output size</span></code></pre></div>
-<ul>
-<li><em>ylabel</em> The text that should be shown in the Y axis (i.e. Intensity, Area). Otherwise, <em>val.to.plot</em> value will be used.</li>
-</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sum_intg &lt;-<span class="st"> </span><span class="kw">sumIsotopologues</span>(integrations)
+<span class="kw">metBarPlot</span>(<span class="dt">autoQres=</span>sum_intg, <span class="dt">groups =</span> mygroups, <span class="dt">val.to.plot=</span><span class="st">&quot;area&quot;</span>)</code></pre></div>
 <p><code>metBarPlot</code> can also digest the data frame produced by <code>QTransform</code>. Read the function help for further information.</p>
 </div>
 <div id="extra-raw-data-plotting" class="section level2">
 <h2>Extra: Raw data plotting</h2>
 <p><code>rawPlot</code> and <code>meanRawPlot</code> functions should be used for quality control purposes. They are useful to check for moving peaks, noisy spots or saturated peaks. The first function will print a “spectra heatmap”, m/z and retention time in the x,y-axis respectively, with points coloured depending on the scan intensity value.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Example plot from first file and first compound</span>
-<span class="kw">rawPlot</span>(<span class="dt">SampleFiles=</span>lf[<span class="dv">1</span>],<span class="dt">formulaTable=</span>formulaTable[<span class="dv">1</span>,],<span class="dt">RTwin=</span><span class="dv">5</span>)</code></pre></div>
+<span class="kw">rawPlot</span>(<span class="dt">SampleFiles=</span>SampleFiles_orbi[<span class="dv">1</span>],<span class="dt">formulaTable=</span>formulaTable_orbi[<span class="dv">1</span>,],<span class="dt">RTwin=</span><span class="dv">5</span>)</code></pre></div>
 <p>While the <code>rawPlot</code> function will run through each file and plot the raw spectra for all compounds in a single pdf file, <code>meanRawPlot</code> will calculate the average spectra for all files and generate a single plot for each compound.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Example plot for the first compound, note that now we use ALL files</span>
-<span class="kw">meanRawPlot</span>(<span class="dt">SampleFiles=</span>lf,<span class="dt">formulaTable=</span>formulaTable[<span class="dv">1</span>,],<span class="dt">RTwin=</span><span class="dv">5</span>)</code></pre></div>
+<span class="kw">meanRawPlot</span>(<span class="dt">SampleFiles=</span>SampleFiles_lowres[<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">3</span>)],
+            <span class="dt">formulaTable=</span>formulaTable_lowres[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>,], 
+            <span class="dt">RTwin=</span><span class="dv">5</span>)</code></pre></div>
 <p>Both functions contain the <code>topdf</code> argument, that is encouraged to be used in order to save the files into <em>PDF format</em> instead of being shown in the R plotting default device. In the case of <code>meanRawPlot</code> indicate the name of the output PDF file desired (<code>topdf=/plot_folder/mean_raw_spectra.pdf</code>), whereas in the case of <code>rawPlot</code> should be used as: <code>topdf=&quot;C:/Users/User/Desktop/plot_folder</code> and all plots generated will be saved into <em>plot_folder</em> mantaining the sample name for the pdf file name.</p>
 </div>
 

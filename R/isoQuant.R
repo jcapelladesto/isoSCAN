@@ -127,7 +127,8 @@ isoQuant.HR <- function(SampleFiles, formulaTable, SNR, minscans , RTwin, fit.p,
     
     targetmz.conv <- doConvPat(targetpat,Res,labelatom)
     
-    ppm_values <- seq(1,maxppm,0.5)
+    # ppm_values <- seq(1,maxppm,0.5)
+    ppm_values <- maxppm
     
     res <- lapply(1:length(SampleFiles),function(s){
       

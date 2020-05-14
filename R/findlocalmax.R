@@ -263,7 +263,7 @@ findIsos <- function(fTi, targetmz,patfoundi,eic,minwidth,maxwidth,minscans,SNR,
       rt <- isoeic$retentionTime
       int <- isoeic$basePeakIntensity
 
-      res <- find.All.LocalMax2(rt, int, minwidth, maxwidth, minscans)
+      res <- find.All.LocalMax(rt, int, minwidth, maxwidth, minscans)
       
       if(is.na(res[[1]][1])){return()}
       res$patfoundi <- i

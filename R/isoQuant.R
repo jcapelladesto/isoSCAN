@@ -143,7 +143,6 @@ isoQuant.HR <- function(SampleFiles, formulaTable, SNR, minscans , RTwin, fit.p,
           targetmz <- eicL$A
           patfoundi <- eicL$B
           procEIC(fTi,targetmz, patfoundi, eic, minwidth, maxwidth, minscans, SNR, fit.p,SampleFiles, s)
-          
         })
       })
       ppm_df <- do.call("c",ppm_df)

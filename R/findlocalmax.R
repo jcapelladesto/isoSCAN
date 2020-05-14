@@ -191,6 +191,10 @@ find.All.LocalMax <- function(rt,int,minwidth,maxwidth,minscans){
           # plot(rt,int)
         }
         
+        if(length(rt)<minscans){
+          doWhile <- F
+        }
+        
       }else{
         doWhile <- F
       }

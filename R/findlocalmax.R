@@ -3,17 +3,41 @@ find.LocalMax <- function(rt,int, minwidth, maxwidth,minscans){
   mxw2 <- maxwidth/2
   miw2 <- minwidth/2
   ### find max
-  maxScan <- which(int==max(int))[1]
-  maxScanRT <- rt[maxScan]
-  maxScanI <- int[maxScan]
+  # maxScan <- which(int==max(int))[1]
+  # maxScanRT <- rt[maxScan]
+  # maxScanI <- int[maxScan]
+  # 
+  # ### find 1st min within X scans/secs?
+  # # LEFT 
+  # idx_l <- which(rt>(maxScanRT-mxw2) & rt<(maxScanRT-miw2) )
+  # 
+  # ### find 2nd min within X scans/secs?
+  # # RIGHT
+  # idx_r <- which(rt<(maxScanRT+(mxw2)) & rt>(maxScanRT+(miw2)) )
+
+  validMax <- T
+  while(validMax){
+    maxScan <- which(int==max(int))[1]
+    maxScanRT <- rt[maxScan]
+    maxScanI <- int[maxScan]
+
+    idx_l <- which(rt>(maxScanRT-mxw2) & rt<(maxScanRT-miw2) )
+
+    idx_r <- which(rt<(maxScanRT+(mxw2)) & rt>(maxScanRT+(miw2)) )
+
+    if(length(idx_l)==0 | length(idx_r)==0){
+      rt <- rt[-maxScan]
+      int <- int[-maxScan]
+    }else{
+      validMax <- F
+    }
+    if(length(rt)==0){
+      validMax <- F
+    }
+
+  }
   
-  ### find 1st min within X scans/secs?
-  # LEFT 
-  idx_l <- which(rt>(maxScanRT-mxw2) & rt<(maxScanRT-miw2) )
-  
-  ### find 2nd min within X scans/secs?
-  # RIGHT
-  idx_r <- which(rt<(maxScanRT+(mxw2)) & rt>(maxScanRT+(miw2)) )
+  # aa <- c(idx_l,maxScan,idx_r); plot(rt[aa],int[aa])
   
   if( (length(idx_l)>0) & (length(idx_r)>0) ){
     
@@ -58,6 +82,71 @@ find.LocalMax <- function(rt,int, minwidth, maxwidth,minscans){
 }
 
 
+# find.All.LocalMax <- function(rt,int,minwidth,maxwidth,minscans){
+#   
+#   res <- find.LocalMax(rt,int,minwidth,maxwidth,minscans)
+#   
+#   if(all(is.na(res))){
+#     df <- NA
+#     
+#   }else{
+#     
+#     pkscns <- res[[1]]
+#     df <- res[[2]]
+#     
+#     input <- data.frame(rt,int) 
+#     
+#     input <- list(input[1:pkscns[1],],
+#                   input[pkscns[length(pkscns)]:nrow(input),])
+#     
+#     in_nrow <- sapply(input,nrow)
+#     
+#     new_check <- (in_nrow>minscans)
+#     
+#     doWhile <- any(new_check)
+#     # if(doWhile){pkscns <- list(c(pkscns))}
+#     
+#     while(doWhile){ # while check?
+#       # print("start While")
+#       doWhile <- F
+#       # print(doWhile)
+#       
+#       input <- input[which(new_check)]
+#       
+#       resList <- lapply(input,function(x) find.LocalMax(x$rt,x$int,minwidth,maxwidth,minscans))
+#       
+#       natest <- sapply(1:length(resList),function(r) is.na(resList[[r]][1] ))
+#       
+#       if(any(!natest)){
+#         resList <- resList[which(!natest)]
+#         pkscns <- list()
+#         for(i in 1:length(resList)){
+#           res <- resList[[i]]
+#           
+#           df <- rbind(df,res[[2]])
+#           
+#           pkscns <- c(pkscns,c(res[1]))
+#         }
+#         input <- lapply(1:length(pkscns),function(i){
+#           p <- pkscns[[i]]
+#           inp <- input[[i]]
+#           list(inp[1:p[1],], inp[p[length(p)]:nrow(inp),])
+#         })
+#         input <- unlist(input,recursive =F)
+#         
+#         in_nrow <- sapply(input,nrow)
+#         new_check <- (in_nrow>minscans)
+#         doWhile <- any(new_check)
+#       }
+#       # print(doWhile)
+#       # print("END")
+#     }
+#     
+#     return(df)
+#   }
+# }
+# 
+
 find.All.LocalMax <- function(rt,int,minwidth,maxwidth,minscans){
   
   res <- find.LocalMax(rt,int,minwidth,maxwidth,minscans)
@@ -70,54 +159,41 @@ find.All.LocalMax <- function(rt,int,minwidth,maxwidth,minscans){
     pkscns <- res[[1]]
     df <- res[[2]]
     
-    input <- data.frame(rt,int)
+    rt <- rt[-pkscns]
+    int <- int[-pkscns]
     
-    input <- list(input[1:pkscns[1],],
-                  input[pkscns[length(pkscns)]:nrow(input),])
-    
-    in_nrow <- sapply(input,nrow)
-    
-    new_check <- (in_nrow>minscans)
-    
-    doWhile <- any(new_check)
-    # if(doWhile){pkscns <- list(c(pkscns))}
+    doWhile <- length(rt)>minscans
     
     while(doWhile){ # while check?
       # print("start While")
-      doWhile <- F
+      # doWhile <- F
       # print(doWhile)
       
-      input <- input[which(new_check)]
+      res <- find.LocalMax(rt,int,minwidth,maxwidth,minscans)
       
-      resList <- lapply(input,function(x) find.LocalMax(x$rt,x$int,minwidth,maxwidth,minscans))
+      natest <- is.na(res[1])
       
-      natest <- sapply(1:length(resList),function(r) is.na(resList[[r]][1] ))
-      
-      if(any(!natest)){
-        resList <- resList[which(!natest)]
-        pkscns <- list()
-        for(i in 1:length(resList)){
-          res <- resList[[i]]
+      if(!(natest)){
+        
+        ndf <- res[[2]]
+        rtcheck <- any(ndf$RTmin>=df$RTmin & ndf$RTmax<=df$RTmax)
+        maxcheck <- any(ndf$maxoRT==df$maxoRT & ndf$maxo==df$maxo)
+        
+        if(rtcheck & maxcheck){
+          doWhile <- F
+        }else{
+          df <- rbind(df,ndf)
+          pkscns <- res[[1]]
           
-          df <- rbind(df,res[[2]])
+          rt <- rt[-pkscns]
+          int <- int[-pkscns]
           
-          pkscns <- c(pkscns,c(res[1]))
+          # plot(rt,int)
         }
-        input <- lapply(1:length(pkscns),function(i){
-          p <- pkscns[[i]]
-          inp <- input[[i]]
-          list(inp[1:p[1],], inp[p[length(p)]:nrow(inp),])
-        })
-        input <- unlist(input,recursive =F)
         
-        
-        
-        in_nrow <- sapply(input,nrow)
-        new_check <- (in_nrow>minscans)
-        doWhile <- any(new_check)
+      }else{
+        doWhile <- F
       }
-      # print(doWhile)
-      # print("END")
     }
     
     return(df)
@@ -187,7 +263,7 @@ findIsos <- function(fTi, targetmz,patfoundi,eic,minwidth,maxwidth,minscans,SNR,
       rt <- isoeic$retentionTime
       int <- isoeic$basePeakIntensity
 
-      res <- find.All.LocalMax(rt, int, minwidth, maxwidth, minscans)
+      res <- find.All.LocalMax2(rt, int, minwidth, maxwidth, minscans)
       
       if(is.na(res[[1]][1])){return()}
       res$patfoundi <- i
@@ -209,7 +285,6 @@ findIsos <- function(fTi, targetmz,patfoundi,eic,minwidth,maxwidth,minscans,SNR,
       res <- res[which(res$SNR > SNR), ]
       
       if(nrow(res)==0){return()}
-      
 
       if(nrow(res) > 1) { # A or B?
         check_RTp <-

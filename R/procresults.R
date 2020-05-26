@@ -93,13 +93,17 @@ checkRows <- function(ppm_df,ppm_values){
     dfidx <- dfidx[which(nas==min(nas))]
   }
   if(length(dfidx)>1){
+    areasum <- areasum[dfidx]
+    dfidx <- dfidx[which(areasum==max(areasum))]
+  }
+  if(length(dfidx)>1){
     abundiff <- (adiff/mdiff)[dfidx]
     dfidx <- dfidx[which(abundiff==min(abundiff))]
   }
-  if(length(dfidx)>1){
-    areasum<- areasum[dfidx]
-    dfidx <- dfidx[which(areasum==max(areasum))]
-  }
+  # if(length(dfidx)>1){
+  #   areasum <- areasum[dfidx]
+  #   dfidx <- dfidx[which(areasum==max(areasum))]
+  # }
   if(length(dfidx)>1){
     ppmerr <- ppm_values[dfidx/((dfidx%/%length(ppm_values)+1))]
     dfidx <- dfidx[which(ppmerr==min(ppmerr))][1]

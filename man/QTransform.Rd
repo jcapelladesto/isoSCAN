@@ -4,7 +4,7 @@
 \alias{QTransform}
 \title{Area or Maxo value transformation}
 \usage{
-QTransform(x = NULL, val.to.use = "Area", val.trans = c("P", "R"))
+QTransform(x = NULL, val.to.use = "area", val.trans = c("P", "R"))
 }
 \arguments{
 \item{x}{The data.frame result from \link{autoQ}}

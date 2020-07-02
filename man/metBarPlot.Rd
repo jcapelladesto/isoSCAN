@@ -18,7 +18,7 @@ metBarPlot(
 
 \item{topdf}{File directory where the plot should be saved. If \code{NULL} plots will be sent to R plotting device}
 
-\item{val.to.plot}{Values to use for plotting. Either "Area" or "Maxo". If values were transformed with \code{Qtransform}, indicate the value used for transformation}
+\item{val.to.plot}{Values to use for plotting. Either "area" or "maxo". If values were transformed with \code{Qtransform}, indicate the value used for transformation}
 
 \item{groups}{Sample groups. A vector of length equal to number of samples that will match the samples order}
 

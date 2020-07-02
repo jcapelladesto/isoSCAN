@@ -218,7 +218,6 @@ isoQuant.LR <- function(SampleFiles, formulaTable, SNR, minscans , RTwin, fit.p,
     res <- lapply(1:length(SampleFiles),function(s){
       h <- hdlist[[s]]
       # myscans <- h$acquisitionNum[which(h$retentionTime>fTiRTRan[1] & h$retentionTime<fTiRTRan[2])]
-      # myscans <- h$acquisitionNum[which(h$retentionTime>fTiRTRan[1] & h$retentionTime<fTiRTRan[2])]
       myscans <- which(h$retentionTime>fTiRTRan[1] & h$retentionTime<fTiRTRan[2])
       eic <- extractEIC(SampleFiles[s],h,myscans,mzmin,mzmax)
       # Isolabel
@@ -258,6 +257,7 @@ isoQuant.LR <- function(SampleFiles, formulaTable, SNR, minscans , RTwin, fit.p,
   })
   
   finalres <- do.call("rbind", finalres)
+  finalres$m.z <- round(finalres$m.z,1)
   rownames(finalres) <- NULL
   return(finalres)
 }

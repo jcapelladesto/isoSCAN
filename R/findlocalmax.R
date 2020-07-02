@@ -159,6 +159,8 @@ find.All.LocalMax <- function(rt,int,minwidth,maxwidth,minscans){
     pkscns <- res[[1]]
     df <- res[[2]]
     
+                                          # df$pkscns <- length(pkscns) #rm
+    
     rt <- rt[-pkscns]
     int <- int[-pkscns]
     
@@ -182,6 +184,7 @@ find.All.LocalMax <- function(rt,int,minwidth,maxwidth,minscans){
         if(rtcheck & maxcheck){
           doWhile <- F
         }else{
+                                                         # ndf$pkscns <- length(res[[1]]) #rm
           df <- rbind(df,ndf)
           pkscns <- res[[1]]
           
@@ -308,7 +311,9 @@ findIsos <- function(fTi, targetmz,patfoundi,eic,minwidth,maxwidth,minscans,SNR,
       
       if(nrow(res)==1) {
         targetmz2 <- targetmz[i, ]
-        targetmz2 <- cbind(targetmz2, res[, c("maxo", "area")])
+        targetmz2 <- cbind(targetmz2, res[, c(
+                                          # "pkscns", #rm
+                                              "maxo", "area")])  
       }else{
         if(nrow(res)>0) {
           print("Too many peaks for")

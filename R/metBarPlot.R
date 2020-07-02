@@ -3,7 +3,7 @@
 #' Creates a PDF file with barplots (Mean +- SD) per each compound and isotopologues using ggplot2
 #' @param autoQres The data.frame result from \link{autoQ} or \link{QTransform}
 #' @param topdf File directory where the plot should be saved. If \code{NULL} plots will be sent to R plotting device
-#' @param val.to.plot Values to use for plotting. Either "Area" or "Maxo". If values were transformed with \code{Qtransform}, indicate the value used for transformation
+#' @param val.to.plot Values to use for plotting. Either "area" or "maxo". If values were transformed with \code{Qtransform}, indicate the value used for transformation
 #' @param groups Sample groups. A vector of length equal to number of samples that will match the samples order
 #' @param ylabel Label for y axis in the plot. If not indicated, val.to.plot value will be used as default.
 #' @param ... other arguments that will be passed to \emph{grDevices::pdf}
@@ -20,7 +20,7 @@ metBarPlot <-
 		ylabel <- val.to.plot 
 	}
 	if(!is.null(topdf)){pdf(topdf,...);sleepval <- sleepval-0.1}
-	plotapply <- lapply(levels(autoQres$CompoundName),function(x){
+	plotapply <- lapply(unique(autoQres$CompoundName),function(x){
 		# message(cat(c("Plotting compoundName:",x,"\n")))
 		selcol2 <- grep(val.to.plot,colnames(autoQres))
 		selcol2 <- colnames(autoQres)[selcol2]
@@ -59,5 +59,5 @@ metBarPlot <-
 
 		# return()
 	})
-	if(!is.null(topdf)){dev.off()}
+	if(!is.null(topdf)){try(dev.off(),silent=T)}
 }

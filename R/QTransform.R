@@ -7,10 +7,10 @@
 #' @return  A data.frame with transformed values. Can be input to \link{metBarPlot}.
 #' @export
 
-QTransform <- function(x=NULL,  val.to.use = "Area", val.trans = c("P","R")){
+QTransform <- function(x=NULL,  val.to.use = "area", val.trans = c("P","R")){
 	if(length(val.trans)==2){stop("Please select an option for 'value.trans': 'P' for percentages or 'R' for relative quantification")}	
 	FinalInt <- x
-	Transapply <- lapply(levels(FinalInt$CompoundName),function(x){ 
+	Transapply <- lapply(unique(FinalInt$CompoundName),function(x){ 
 		selcol2 <- grep(val.to.use,colnames(FinalInt))
 		pos <- which(FinalInt$CompoundName==x)
 		resmat <- apply(FinalInt[pos,selcol2],2,function(y){

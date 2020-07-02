@@ -31,7 +31,7 @@ rawdat <- lapply(SampleFiles,function(fn){
 })
 # remove all below ??
 
-dcmals <- sapply(h$basePeakMZ[sample(x = 1:nrow(h),size=100)],countDecimalPlaces)
+dcmals <- sapply(rawdat$basePeakMZ[sample(x = 1:nrow(h),size=100)],countDecimalPlaces)
 # if(all(dcmals>2)){stop("Sorry this function only works for Low-resolution data. Please, try rawPlot.")}
 message("Plotting spectra")
 if(!is.null(topdf)) {pdf(file=topdf)}

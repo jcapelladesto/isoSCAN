@@ -5,8 +5,6 @@
 #' @return A data frame with a row per each isotopologue and compound with corrected abundances per sample.
 #' @export
 #' 
-#' 
-#' https://bioconductor.org/packages/devel/bioc/vignettes/IsoCorrectoRGUI/inst/doc/IsoCorrectoRGUI.html#why-perform-correction-for-natural-stable-isotope-abundance-and-tracer-purity
 
 subNatural <- function(autoQres){
   ppmi <- grep("ppm",colnames(autoQres))

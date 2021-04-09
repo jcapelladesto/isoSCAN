@@ -13,7 +13,8 @@ QTransform <- function(x=NULL,  val.to.use = "area", val.trans = c("P","R")){
 	Transapply <- lapply(unique(FinalInt$CompoundName),function(x){ 
 		selcol2 <- grep(val.to.use,colnames(FinalInt))
 		pos <- which(FinalInt$CompoundName==x)
-		resmat <- apply(FinalInt[pos,selcol2],2,function(y){
+		y <- FinalInt[pos, 1:2,drop=F]
+		resmat <- apply(FinalInt[pos, selcol2,drop=F], 2, function(y) {
 			if(val.trans=="P"){res <- sum(y,na.rm=T)/100}
 			if(val.trans=="R"){res  <- y[1] }
 			res <- (y/res)
@@ -22,7 +23,11 @@ QTransform <- function(x=NULL,  val.to.use = "area", val.trans = c("P","R")){
 			if(all(is.na(resmat))){
 			warning(call.=F,paste(c(x," has no ",val.to.use," values.")))
 		}
-		resmat <- cbind(FinalInt[pos,1:2],resmat)
+		# resmat <- cbind(FinalInt[pos,1:2],resmat)
+		resmat <- data.frame(resmat)
+		if(nrow(resmat)>nrow(y)){resmat <- t(resmat)}
+		colnames(resmat) <- colnames(FinalInt)[selcol2]
+		resmat <- cbind(y, resmat)
 		return(resmat)
 	})
 	Transapply <- do.call("rbind",Transapply)

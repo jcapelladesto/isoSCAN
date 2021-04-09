@@ -37,15 +37,34 @@ checkRows <- function(ppm_df,ppm_values){
   if(length(ppm_df)==0){
     return(data.frame())
   }
+  if(length(ppm_df)>1){
+  	ident1 <- sapply(seq(1,length(ppm_df)/2),function(i) identical(ppm_df[[i]],ppm_df[[i+length(ppm_df)/2]]))
+  	if(any(ident1)){
+  		ppm_df <- ppm_df[seq(1,length(ppm_df)/2)[which(ident1)]]
+  	}
+  }
+  if(length(ppm_df)>1){
+  	ident1 <- sapply(seq(1,length(ppm_df)-1),
+  									 function(j){
+  									 	k <- sapply(seq(2,length(ppm_df)),
+  									 							function(k){
+  									 								identical(ppm_df[[j]],ppm_df[[k]])
+  									 							})
+  									 	if(any(k)){return()}else{return(j)}
+  									 })
+  	ident1 <- unlist(ident1 )
+  	if(any(ident1)){
+  		ppm_df <- ppm_df
+  	}
+  }
   
   if(length(ppm_df)==1){
-    return(ppm_df[[1]]) 
+    return(ppm_df[[1]])
   }
   
   a <- 2:length(ppm_df)
   b <- 1:(length(ppm_df)-1)
   rwsdiff <- c(1,rws[a]/rws[b])
-  
   nas <- sapply(ppm_df,function(x) sum(is.na(x)))
   
   maxosum <- sapply(ppm_df,function(x) sum(x[,grep("maxo",colnames(x))],na.rm=T) )
@@ -72,26 +91,34 @@ checkRows <- function(ppm_df,ppm_values){
   }
   
   ppmerr <- sapply(ppm_df,function(x) sum(x$ppm,na.rm=T)) 
-  ppmerr <- (ppmerr/ppm_values)/rws # added rws factor
+  # ppmerr <- (ppmerr/ppm_values)/rws # added rws factor
   
   abundiff <- (adiff/mdiff)
   
-  m0found <- sapply(ppm_df,function(x) any(x$abundance==100))
+  m0found <- sapply(ppm_df, function(x) any(round(x$abundance) == 100))
   
-  dfidx <- which(
-    ppmerr<quantile(ppmerr,0.85)  &
-      rws>=quantile(rws,0.25)   &
-      abundiff>=quantile(abundiff,0.25)  ) # was 0.33
+  nisos <- sapply(ppm_df, function(x) length(unique(x$Isotopologue)))
+  maxisos <- sapply(ppm_df, function(x) max(x$Isotopologue))
+
+  # dfidx <- which(
+  #   ppmerr<quantile(ppmerr,0.85)  &
+  #     rws>=quantile(rws,0.25)   &
+  #     abundiff>=quantile(abundiff,0.25)  ) # was 0.33
+  
+  dfidx <- 1:length(ppm_df)
   
   if(length(dfidx)>1 & any(m0found)){
     m0found <- m0found[dfidx]
     dfidx <- dfidx[which(m0found)]
   }
-  
-  if(length(dfidx)>1){
-    nas <- nas[dfidx]
-    dfidx <- dfidx[which(nas==min(nas))]
+  if (length(dfidx) > 1) {
+  	mostisos <- nisos[dfidx]
+  	dfidx <- dfidx[which(mostisos==max(mostisos))]
   }
+  # if(length(dfidx)>1){
+  #   nas <- nas[dfidx]
+  #   dfidx <- dfidx[which(nas==min(nas))]
+  # }
   if(length(dfidx)>1){
     areasum <- areasum[dfidx]
     dfidx <- dfidx[which(areasum==max(areasum))]
@@ -100,13 +127,24 @@ checkRows <- function(ppm_df,ppm_values){
     abundiff <- (adiff/mdiff)[dfidx]
     dfidx <- dfidx[which(abundiff==min(abundiff))]
   }
+  if (length(dfidx) > 1) {
+  	nas <- nas[dfidx]
+  	dfidx <- dfidx[which(nas == min(nas))]
+  }
   # if(length(dfidx)>1){
   #   areasum <- areasum[dfidx]
   #   dfidx <- dfidx[which(areasum==max(areasum))]
   # }
   if(length(dfidx)>1){
-    ppmerr <- ppm_values[dfidx/((dfidx%/%length(ppm_values)+1))]
+  	# ppmerr <- ppm_values[dfidx/((dfidx%/%length(ppm_values) + 1)]
+  	ppmerr <- ppmerr/(rws^2)
     dfidx <- dfidx[which(ppmerr==min(ppmerr))][1]
+  }
+  
+  if (length(dfidx) != 1 & any(m0found)){
+  	r <-ppm_df[[which.max(rws[m0found])]]
+  	rownames(r) <- NULL
+  	return(r)
   }
   
   if(length(dfidx)==0){

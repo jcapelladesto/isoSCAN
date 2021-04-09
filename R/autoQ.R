@@ -18,14 +18,15 @@
 #' @param massdiff Stable isotope mass difference, for C13: 1.003355, necessary for low-resolution. 
 #' @param mzerror Symmetric (+/-) absolute mass error to consider in low-resolution data.
 #' @param maxppm Symmetric (+/-) maximum ppm mass error to consider in high-resolution data.
-#' @param isotopes Dataframe with stable isotopes information as in  \link{enviPat::isotopes}
+#' @param isotopes Dataframe with stable isotopes information as in  \link[enviPat]{isotopes}
 #' @param labelatom Labeling atom used as in isotopes$isotope. For example, "13C".
+#' @param thr Inherited from \link[enviPat]{isopattern}. Probability below which isotope peaks can be omitted. Default = 0.1. Recommended values between: 0.5 and 0.01. 
 #' @return A data.frame including the Area and Maxo for each file and metabolite isotopologues. If peak was missing, values are NA.
 #' @details In the case of high-resolution and additional column indicating the estimated mass accuracy error (in ppm) per each isotopologue and sample is included.
 #' @export
 
 autoQ <- function(SampleFiles=NULL, formulaTable=NULL, SNR=3, minscans = 6, RTwin = 5, fit.p = 0.05,
-                  resolution = NA, minwidth=1,  maxwidth=4,
+                  resolution = NA, minwidth=1,  maxwidth=4, thr=0.1,
                   mzerror = 0.1, massdiff = 1.003355, 
                   maxppm=5, isotopes, labelatom="13C"){
   
@@ -36,18 +37,17 @@ autoQ <- function(SampleFiles=NULL, formulaTable=NULL, SNR=3, minscans = 6, RTwi
   
   if(resolution[1]==1){
     #nominal
-    HR <- F
     df <- isoQuant.LR(SampleFiles, formulaTable, SNR, minscans , RTwin, fit.p,
-                      mzerror, massdiff, minwidth, maxwidth, HR)
+                      mzerror, massdiff, minwidth, maxwidth)
     
   }else{
-    HR <-T
     df <- isoQuant.HR(SampleFiles, formulaTable, SNR, minscans, RTwin, fit.p, maxppm,
-                      minwidth,  maxwidth, isotopes, labelatom,  resolution, HR)
+                      minwidth,  maxwidth, isotopes, labelatom,  resolution, thr)
     
     # remove ppm abundance columns ?
   }
   df$Isotopologue <- paste0("M+",df$Isotopologue)
+  # do not make CpdName factor, only in plot funcs
   return(df)
   
 }

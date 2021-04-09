@@ -27,8 +27,8 @@ buildFormulaTable <-
 			res <- as.numeric(gsub(pattern=atom.symbol,replacement="",reg))
 			return(res)
 		})
-		if(!is.factor(formulaTable$CompoundName)){
-		formulaTable$CompoundName <- factor(formulaTable$CompoundName,levels=unique(formulaTable$X))
-		}
+		# if(!is.factor(formulaTable$CompoundName)){
+		# formulaTable$CompoundName <- factor(formulaTable$CompoundName,levels=unique(formulaTable$CompoundName))
+		# }
 		return(formulaTable)
 	}

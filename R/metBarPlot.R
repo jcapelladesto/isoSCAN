@@ -32,7 +32,7 @@ metBarPlot <-
     resmat$variable <- rep(groups,each=nrow(plotdata))
 		resmat$variable <- as.factor(resmat$variable)
 		if(all(is.na(resmat$value))){
-			message("Not quantified")
+			message(paste(c("No data found for:",x)))
 			return()
 		}
 		Myplot <- ggplot(data=resmat,
@@ -51,7 +51,7 @@ metBarPlot <-
 		  ylab(ylabel)
 		
 
-		if (all(resmat$value<=1)) {
+		if (all(resmat$value<=1,na.rm=T) & any(resmat$value<0.1,na.rm=T)) {
 			try(Myplot <- Myplot+
 			      scale_y_continuous(breaks=seq(0,max(resmat$value,na.rm=T),0.1)),silent=T)
 		}

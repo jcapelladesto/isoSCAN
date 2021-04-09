@@ -14,6 +14,7 @@ autoQ(
   resolution = NA,
   minwidth = 1,
   maxwidth = 4,
+  thr = 0.1,
   mzerror = 0.1,
   massdiff = 1.003355,
   maxppm = 5,
@@ -41,13 +42,15 @@ Set to a fixed average resolution value if qTOF instrument is used (for example,
 
 \item{maxwidth}{Maximum width (in seconds) of a detected EIC peak to be considered}
 
+\item{thr}{Inherited from \link[enviPat]{isopattern}. Probability below which isotope peaks can be omitted. Default = 0.1. Recommended values between: 0.5 and 0.01.}
+
 \item{mzerror}{Symmetric (+/-) absolute mass error to consider in low-resolution data.}
 
 \item{massdiff}{Stable isotope mass difference, for C13: 1.003355, necessary for low-resolution.}
 
 \item{maxppm}{Symmetric (+/-) maximum ppm mass error to consider in high-resolution data.}
 
-\item{isotopes}{Dataframe with stable isotopes information as in  \link{enviPat::isotopes}}
+\item{isotopes}{Dataframe with stable isotopes information as in  \link[enviPat]{isotopes}}
 
 \item{labelatom}{Labeling atom used as in isotopes$isotope. For example, "13C".}
 }

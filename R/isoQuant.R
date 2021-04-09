@@ -16,13 +16,13 @@ extractEIC <- function(myfile,h,myscans,mzmin,mzmax){
   return(eic)
 }
 
-searchEIC.HR <- function(targetmz,eic,ppm){
+searchEIC.HR <- function(targetmz,eic,ppm,minscans){
   patppmi <- lapply(targetmz$m.z,function(x){ ppmDiff(eic$basePeakMZ,x) })
   patfoundi <- lapply(1:length(patppmi),function(x){ 
     ppmi <- targetmz$ppm[x]
     x <- patppmi[[x]]
     if(ppmi<ppm){ppm <- ppmi}
-    idx <-  which(x<ppm)
+    idx <- which(x<ppm)
     return(idx)
   })
   patppmi <- sapply(1:length(patppmi),function(x){ 
@@ -30,12 +30,14 @@ searchEIC.HR <- function(targetmz,eic,ppm){
     idx <- patfoundi[[x]]
     median(ppmd[idx])
   })
-  if(any(is.na(patppmi ))){
+  if(any(is.na(patppmi))){
     patfoundi <- patfoundi[-which(is.na(patppmi))]
     targetmz <- targetmz[-which(is.na(patppmi)),]
     patppmi <- patppmi[-which(is.na(patppmi))]
   }
   targetmz$ppm <- patppmi
+  targetmz <- targetmz[which(sapply(patfoundi,length)>minscans),]
+  patfoundi <- patfoundi[which(sapply(patfoundi,length)>minscans)]
   
   return(list("A"=targetmz,"B"=patfoundi))
 }
@@ -82,7 +84,9 @@ procEIC <- function(fTi,targetmz, patfoundi, eic, minwidth, maxwidth, minscans, 
 
 isoQuant.HR <- function(SampleFiles, formulaTable, SNR, minscans , RTwin, fit.p,
                         maxppm, minwidth, maxwidth, isotopes, labelatom,
-                        resolution, HR){
+                        resolution, thr){
+	
+	HR <- T
   
   # preload sample headers
   hdlist <- lapply(1:length(SampleFiles),function(s){
@@ -107,9 +111,9 @@ isoQuant.HR <- function(SampleFiles, formulaTable, SNR, minscans , RTwin, fit.p,
     isomass <- isotopes$mass[which(isotopes$isotope==labelatom & isotopes$element==atom)]
     atmass <- isotopes$mass[which(isotopes$element==atom & isotopes$isotope!=labelatom)]
     
-    massdiff <- isomass-atmass
-    mzmin <- fTiMZ-1
-    mzmax <- ceiling(fTiMZ+((natom+1)*massdiff))
+    massdiff <- isomass - atmass
+    mzmin <- fTiMZ - 1
+    mzmax <- ceiling(fTiMZ + ((natom + 0.5) * massdiff))
     
     if(length(resolution)==1){
       # fixed Res
@@ -121,7 +125,7 @@ isoQuant.HR <- function(SampleFiles, formulaTable, SNR, minscans , RTwin, fit.p,
     
     targetisos <- iso.generator(fTiFormula,labelatom,1:natom,isotopes)
     
-    targetpat <- getTargetPat(targetisos,isotopes,mzmax,labelatom)
+    targetpat <- getTargetPat(targetisos,isotopes,mzmax,labelatom,thr)
     
     targetmz.theo <- doTheoPat(targetpat,labelatom)
     
@@ -139,7 +143,7 @@ isoQuant.HR <- function(SampleFiles, formulaTable, SNR, minscans , RTwin, fit.p,
       
       ppm_df <- lapply(list(targetmz.conv,targetmz.theo),function(x){
         lapply(ppm_values, function(ppm){
-          eicL <- searchEIC.HR(x,eic,ppm)
+          eicL <- searchEIC.HR(x,eic,ppm,minscans)
           targetmz <- eicL$A
           patfoundi <- eicL$B
           procEIC(fTi,targetmz, patfoundi, eic, minwidth, maxwidth, minscans, SNR, fit.p,SampleFiles, s)
@@ -189,8 +193,8 @@ isoQuant.HR <- function(SampleFiles, formulaTable, SNR, minscans , RTwin, fit.p,
 
 
 isoQuant.LR <- function(SampleFiles, formulaTable, SNR, minscans , RTwin, fit.p,
-                        mzerror, massdiff, minwidth, maxwidth, HR){
-  
+                        mzerror, massdiff, minwidth, maxwidth){
+  HR <- F
   # preload sample headers
   hdlist <- lapply(1:length(SampleFiles),function(s){
     oMS <- mzR::openMSfile(SampleFiles[s])

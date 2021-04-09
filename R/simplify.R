@@ -63,11 +63,12 @@ simplifybyIso <- function(finalres){
             dfrepair <- res[idx[j],]
             dfa[] <-Map(function(x,y) {x[is.na(x)] <- y[is.na(x)]; x}, dfa, dfrepair)
           }
-          dfa$m.z <- mean(res$m.z[c(i,idx)])
-          dfa$abundance <- mean(res$abundance[c(i,idx)])
-          res <- res[-idx,]
-          res[i,] <- dfa
-          i <- 1 #reset?
+          dfa$m.z <- mean(res$m.z[c(i, idx)])
+          dfa$abundance <- mean(res$abundance[c(i, idx)])
+          # res <- res[-idx, ]
+          res[i, ] <- dfa
+          res <- res[-idx, ]
+          i <- 1
         }
         i <- i+1
       }

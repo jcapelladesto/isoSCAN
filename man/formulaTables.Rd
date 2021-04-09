@@ -4,7 +4,9 @@
 \name{formulaTables}
 \alias{formulaTables}
 \title{Example data frames input for autoQ function}
-\format{A data.frame containing minimal information to run \link{autoQ} with extdata files}
+\format{
+A data.frame containing minimal information to run \link{autoQ} with extdata files
+}
 \usage{
 data(formulaTables)
 }

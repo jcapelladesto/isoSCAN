@@ -3,12 +3,13 @@
 #' Fractional contribution quantifies the contribution of a labeled nutrient to the metabolite of interest.
 #' @param finalres Dataframe resulting from \emph{autoQ} function
 #' @param val.to.use Type of quantification to transform. Either "Area" or "Maxo"
+#' @param formulaTable Dataframe including CompoundName, Formula, mz, RT and NumAtoms (used in  \link{autoQ})
 #' @return A data.frame containing a FrC value for every sample and compound.
 #' @references doi: 10.1016/j.copbio.2015.02.003
 #' @export
 #' 
 
-calcFrC <- function(FinalInt){
+calcFrC <- function(FinalInt, val.to.use, formulaTable){
   frcres <- lapply(unique(FinalInt$CompoundName), function(y) {
     selcol2 <- grep(val.to.use, colnames(FinalInt))
     x <- finalres[which(finalres$CompoundName==y),]

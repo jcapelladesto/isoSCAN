@@ -10,7 +10,9 @@ sumIsoLabel <- function(pattern.list,labelatom){ # sums columns 13C
       	nname <- setdiff(colnames(tempe), colnames(temp))
       	temp <- cbind(temp, 0)
       	colnames(temp)[ncol(temp)] <- nname
-      	temp <- temp[, colnames(tempe)]
+      	temp <- temp[, colnames(tempe), drop = F]
+      	tidx <- grep(labelatom, colnames(temp))
+      	tidx2 <- tidx
       }else{
       	tempi <- temp[, tidx[1], drop=F]
       	temp[, tidx[2]] <- temp[, tidx[2]] + tempi
@@ -22,7 +24,7 @@ sumIsoLabel <- function(pattern.list,labelatom){ # sums columns 13C
       																				min(mzdiff)), 2])/100
       	temp[, 2] <- temp[, 2] * abuprev
       }
-    	temp <- temp[which(temp[, tidx2] %in% c(i - 1, i)), ]
+    	temp <- temp[which(temp[, tidx2] %in% c(i - 1, i)),, drop = F]
     }
     # temp <- temp[which(temp[,tidx2]%in%c(i-1,i)),] #,i+1
     pattern.list[[i]] <- temp

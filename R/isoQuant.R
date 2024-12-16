@@ -92,7 +92,7 @@ isoQuant.HR <- function(SampleFiles, formulaTable, SNR, minscans , RTwin, fit.p,
   hdlist <- lapply(1:length(SampleFiles),function(s){
     oMS <- mzR::openMSfile(SampleFiles[s])
     h <- mzR::header(oMS)
-    h <- h[,c("retentionTime","acquisitionNum")]
+    h <- h[,c("retentionTime","acquisitionNum","polarity")]
     cbind(h,sample=s)
   })
   
@@ -138,7 +138,8 @@ isoQuant.HR <- function(SampleFiles, formulaTable, SNR, minscans , RTwin, fit.p,
       
       h <- hdlist[[s]]
       # myscans <- h$acquisitionNum[which(h$retentionTime>fTiRTRan[1] & h$retentionTime<fTiRTRan[2])]
-      myscans <- which(h$retentionTime>fTiRTRan[1] & h$retentionTime<fTiRTRan[2])
+      myscans <- which(h$retentionTime>fTiRTRan[1] & h$retentionTime<fTiRTRan[2] & 
+      								 	h$polarity == fTi$polarity)
       eic <- extractEIC(SampleFiles[s],h,myscans,mzmin,mzmax)
       
       ppm_df <- lapply(list(targetmz.conv,targetmz.theo),function(x){
@@ -199,7 +200,7 @@ isoQuant.LR <- function(SampleFiles, formulaTable, SNR, minscans , RTwin, fit.p,
   hdlist <- lapply(1:length(SampleFiles),function(s){
     oMS <- mzR::openMSfile(SampleFiles[s])
     h <- mzR::header(oMS)
-    h <- h[,c("retentionTime","acquisitionNum")]
+    h <- h[,c("retentionTime","acquisitionNum","polarity")]
     cbind(h,sample=s)
   })
   
@@ -222,7 +223,8 @@ isoQuant.LR <- function(SampleFiles, formulaTable, SNR, minscans , RTwin, fit.p,
     res <- lapply(1:length(SampleFiles),function(s){
       h <- hdlist[[s]]
       # myscans <- h$acquisitionNum[which(h$retentionTime>fTiRTRan[1] & h$retentionTime<fTiRTRan[2])]
-      myscans <- which(h$retentionTime>fTiRTRan[1] & h$retentionTime<fTiRTRan[2])
+      myscans <- which(h$retentionTime>fTiRTRan[1] & h$retentionTime<fTiRTRan[2] &
+      								 h$polarity == fTi$polarity)
       eic <- extractEIC(SampleFiles[s],h,myscans,mzmin,mzmax)
       # Isolabel
       eicL <- searchEIC.LR(targetmz,eic,mzerror)

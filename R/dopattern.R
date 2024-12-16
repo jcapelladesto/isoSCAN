@@ -1,34 +1,38 @@
 sumIsoLabel <- function(pattern.list,labelatom){ # sums columns 13C 
   
-  for(i in 1:length(pattern.list)){
-    temp <- pattern.list[[i]]
-    tidx <- grep(labelatom,colnames(temp))
-    tidx2 <- tidx
-    if(i!=1){
-      if(length(tidx)==1){
-      	tempe <- pattern.list[[1]]
-      	nname <- setdiff(colnames(tempe), colnames(temp))
-      	temp <- cbind(temp, 0)
-      	colnames(temp)[ncol(temp)] <- nname
-      	temp <- temp[, colnames(tempe), drop = F]
-      	tidx <- grep(labelatom, colnames(temp))
-      	tidx2 <- tidx
-      }else{
-      	tempi <- temp[, tidx[1], drop=F]
-      	temp[, tidx[2]] <- temp[, tidx[2]] + tempi
-      	temp <- temp[, (-1) * (tidx[1]), drop=F]
-      	tidx2 <- (tidx[length(tidx)] - 1)
-      	abuprev <- pattern.list[[i - 1]][, 1:2, drop=F]
-      	mzdiff <- abs(temp[1, 1] - abuprev[, 1])
-      	abuprev <- as.numeric(abuprev[which(mzdiff == 
-      																				min(mzdiff)), 2])/100
-      	temp[, 2] <- temp[, 2] * abuprev
-      }
-    	temp <- temp[which(temp[, tidx2] %in% c(i - 1, i)),, drop = F]
-    }
-    # temp <- temp[which(temp[,tidx2]%in%c(i-1,i)),] #,i+1
-    pattern.list[[i]] <- temp
-  }
+	for (i in 1:length(pattern.list)) {
+		temp <- pattern.list[[i]]
+		tidx <- grep(labelatom, colnames(temp))
+		tidx2 <- tidx
+		if (i != 1) {
+			if (length(tidx) == 1) {
+				tempe <- pattern.list[[1]]
+				nname <- setdiff(colnames(tempe), colnames(temp))
+				if(length(nname)>0){
+					temp <- cbind(temp, 0)
+					colnames(temp)[ncol(temp)] <- nname
+					temp <- temp[, colnames(tempe), drop = F]
+				}
+			} 
+			temp <- temp[,colnames(pattern.list[[1]]),drop=F]
+		}
+		pattern.list[[i]] <- temp
+	}
+	
+	for(i in 2:length(pattern.list)) {
+		temp <- pattern.list[[i]]
+		pre <- pattern.list[[i-1]]
+		p <- pre[,-c(1:2),drop=F]
+		tn <- temp[1,-c(1:2),drop=F]
+		p <- abs(sweep(p, 2, tn))
+		p0 <- apply(p,1,sum)==0
+		if(any(p0)){
+			# print(n)
+			pi <- pre[which(p0),,drop=F]
+			temp[,2] <- temp[,2]*pi[,2]/100
+		}
+		pattern.list[[i]] <- temp
+	}
   
   return(pattern.list)
 }
@@ -73,13 +77,21 @@ getTargetPat <- function(targetisos,isotopes,maxmz,labelatom,thr=thr){
   
   for (i in 1:length(targetpat)) {
   	temp <- targetpat[[i]]
-  	temp <- temp[which(temp[, 1] < maxmz), ,drop=F]
+  	dup_check <- duplicated(colnames(temp))
+  	if(any(dup_check)){
+  		dup_n <- colnames(temp)[which(dup_check)]
+  		dup_i <- which(colnames(temp)==dup_n)
+  		temp[,dup_i[2]] <- temp[,dup_i[1]]+temp[,dup_i[2]]
+  		temp <- temp[,-dup_i[1]]
+  	}
+  	temp <- temp[which(temp[, 1] < maxmz), , drop = F]
   	targetpat[[i]] <- temp
   }
   rm(temp)
   
   targetpat <- sumIsoLabel(targetpat,labelatom) 
   
+
   return(targetpat)
 }
 
@@ -97,7 +109,7 @@ doTheoPat <- function(targetpat,labelatom){
   targetmz$ppm <- sapply(1:length(targetmz$m.z),function(z){
     m <- targetmz$m.z[z]
     diff <- ppmDiff(targetmz$m.z[-z],m)  
-    diff[which(diff==min(diff))]*0.90
+    diff[which(diff==min(diff))[1]]*0.90
   })
   
   return(targetmz)
@@ -126,7 +138,7 @@ doConvPat <- function(targetpat,Res,labelatom){
   ppmi <- sapply(1:nrow(targetmz),function(z){
     m <- targetmz$m.z[z]
     diff <- ppmDiff(targetmz$m.z[-z],m)
-    diff[which(diff==min(diff))]*0.90
+    diff[which(diff==min(diff))[1]]*0.90
   })
   
   check_isos <- floor(targetmz$m.z)

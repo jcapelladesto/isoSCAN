@@ -8,5 +8,5 @@
 Automatic Integration for GC-CI-MS Stable Isotope Labelling
 }
 \author{
-Pere Rafols
+Jordi Capellades
 }

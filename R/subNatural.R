@@ -8,31 +8,31 @@
 #' 
 
 subNaturalM0 <- function(autoQres){
-  ppmi <- grep("ppm",colnames(autoQres))
-  newres <- lapply(unique(autoQres$CompoundName),function(x){
-    pos <- which(autoQres$CompoundName==x)
-    resi <- autoQres[pos,]
-    abu <- resi$abundance
-    abu <- (abu/100)
-    abu[1] <- 0
-    valcols <- 5:ncol(resi)
-    valcols <- valcols[-which(valcols%in%ppmi)]
-    for(j in valcols){
-      # y <- resi[,j]
-      # y <- y-(y[1]*abu)
-      # y[y<0] <- 0
-      # resi[,j] <- y
-      y <- resi[, j]
-      y[is.na(y)] <- 0
-      y <- (y - (y[1] * abu))
-      y[y < 0] <- 0
-      resi[, j] <- y
-    }
-    return(resi)
-  })
-  newres <- do.call("rbind",newres)
-  
-  return(newres) 
+	ppmi <- grep("ppm",colnames(autoQres))
+	newres <- lapply(unique(autoQres$CompoundName),function(x){
+		pos <- which(autoQres$CompoundName==x)
+		resi <- autoQres[pos,]
+		abu <- resi$abundance
+		abu <- (abu/100)
+		abu[1] <- 0
+		valcols <- 5:ncol(resi)
+		valcols <- valcols[-which(valcols%in%ppmi)]
+		for(j in valcols){
+			# y <- resi[,j]
+			# y <- y-(y[1]*abu)
+			# y[y<0] <- 0
+			# resi[,j] <- y
+			y <- resi[, j]
+			y[is.na(y)] <- 0
+			y <- (y - (y[1] * abu))
+			y[y < 0] <- 0
+			resi[, j] <- y
+		}
+		return(resi)
+	})
+	newres <- do.call("rbind",newres)
+	
+	return(newres) 
 }
 
 
@@ -75,7 +75,8 @@ subNaturalAll <- function(autoQres){
 			}
 			resi[,j] <- y
 		}
-})
+		return(resi)
+	})
 	newres <- do.call("rbind",newres)
 	return(newres)
 }

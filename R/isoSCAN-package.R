@@ -3,7 +3,7 @@
 #' Automatic Integration for GC-CI-MS Stable Isotope Labelling
 #' 
 #' @docType package
-#' @author Pere Rafols
+#' @author Jordi Capellades
 #' @import mzR
 #' @import reshape2
 #' @import enviPat

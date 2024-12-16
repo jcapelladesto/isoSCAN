@@ -125,7 +125,8 @@ isoQuant.HR <- function(SampleFiles, formulaTable, SNR, minscans , RTwin, fit.p,
     
     targetisos <- iso.generator(fTiFormula,labelatom,1:natom,isotopes)
     
-    targetpat <- getTargetPat(targetisos,isotopes,mzmax,labelatom,thr)
+    targetpat <- getTargetPat(targetisos,isotopes,mzmax,labelatom,
+    													thr,polarity=fTi$Polarity)
     
     targetmz.theo <- doTheoPat(targetpat,labelatom)
     
@@ -139,7 +140,7 @@ isoQuant.HR <- function(SampleFiles, formulaTable, SNR, minscans , RTwin, fit.p,
       h <- hdlist[[s]]
       # myscans <- h$acquisitionNum[which(h$retentionTime>fTiRTRan[1] & h$retentionTime<fTiRTRan[2])]
       myscans <- which(h$retentionTime>fTiRTRan[1] & h$retentionTime<fTiRTRan[2] & 
-      								 	h$polarity == fTi$polarity)
+      								 	h$polarity == fTi$Polarity)
       eic <- extractEIC(SampleFiles[s],h,myscans,mzmin,mzmax)
       
       ppm_df <- lapply(list(targetmz.conv,targetmz.theo),function(x){
@@ -224,7 +225,7 @@ isoQuant.LR <- function(SampleFiles, formulaTable, SNR, minscans , RTwin, fit.p,
       h <- hdlist[[s]]
       # myscans <- h$acquisitionNum[which(h$retentionTime>fTiRTRan[1] & h$retentionTime<fTiRTRan[2])]
       myscans <- which(h$retentionTime>fTiRTRan[1] & h$retentionTime<fTiRTRan[2] &
-      								 h$polarity == fTi$polarity)
+      								 h$polarity == fTi$Polarity)
       eic <- extractEIC(SampleFiles[s],h,myscans,mzmin,mzmax)
       # Isolabel
       eicL <- searchEIC.LR(targetmz,eic,mzerror)

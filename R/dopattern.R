@@ -70,10 +70,13 @@ removeDuplicates <- function(isopat.matrix){
   return(isopat.matrix)
 }
 
-getTargetPat <- function(targetisos,isotopes,maxmz,labelatom,thr=thr){
+getTargetPat <- function(targetisos,isotopes,maxmz,labelatom,thr=thr,polarity=1){
+	
+	if(polarity=="P"){pol <- 1 }else{pol <- (-1)}
+	
   targetpat <- enviPat::isopattern(isotopes=isotopes,
                                    chemforms = targetisos,
-                                   charge = 1,verbose = F,threshold = thr)
+                                   charge = pol,verbose = F,threshold = thr)
   
   for (i in 1:length(targetpat)) {
   	temp <- targetpat[[i]]

@@ -72,7 +72,7 @@ removeDuplicates <- function(isopat.matrix){
 
 getTargetPat <- function(targetisos,isotopes,maxmz,labelatom,thr=thr,polarity=1){
 	
-	if(polarity=="P"){pol <- 1 }else{pol <- (-1)}
+	if(polarity==1){pol <- 1 }else{pol <- (-1)}
 	
   targetpat <- enviPat::isopattern(isotopes=isotopes,
                                    chemforms = targetisos,

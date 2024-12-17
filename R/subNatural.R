@@ -56,24 +56,28 @@ subNaturalAll <- function(autoQres){
 		abu <- resi$abundance/100
 		valcols <- 5:ncol(resi)
 		valcols <- valcols[-which(valcols%in%ppmi)]
-		for(j in valcols){
-			y <- resi[,j]
-			for(n in unique(isos)){
-				idxi <- which(isos==n)
+		for (j in valcols) {
+			y <- resi[, j]
+			for (n in unique(isos)) {
+				idxi <- which(isos == n)
 				maxi <- which.max(abu[idxi])
 				topiso <- idxi[maxi]
-				excl <- unique(c(topiso,which(nisos<n)))
-				newy <- rep(0,length(isos))
-				if(length(excl)<length(y)){
-					abuy <- abu/abu[topiso]
-					newy[-excl] <- (y[topiso]*abuy[-excl])
-					newy[newy<0] <- 0
+				if(!is.na(y[topiso])){
+					excl <- unique(c(topiso, which(nisos < n)))
+					newy <- rep(0, length(isos))
+					if (length(excl) < length(y)) {
+						abuy <- abu/abu[topiso]
+						newy[-excl] <- (y[topiso] * abuy[-excl])
+						newy[newy < 0] <- 0
+					}
+					if (any(is.na(y))) {
+						newy[is.na(y)] <- NA
+					}
+					y <- y - newy
+					y[y < 0] <- 0
 				}
-				if(any(is.na(y))){ newy[is.na(y)] <- NA}
-				y <- y-newy
-				y[y<0] <- 0
 			}
-			resi[,j] <- y
+			resi[, j] <- y
 		}
 		return(resi)
 	})

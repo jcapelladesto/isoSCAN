@@ -40,34 +40,47 @@ decompose.formula <- function(formula){
   return(r)
 }
 
-iso.generator <- function(formula,atom,nisos,isotopes){
-  
-  isos <- isotopes[which(isotopes$isotope==atom),]
-  isos <- isos[grep("\\[",isos$element),]
-  
-  isoel <- gsub("[0-9]","",atom)
-  
-  decform <- decompose.formula(formula)
-  isoidx <- which(decform$Element==isoel)
-  isoeln <- as.numeric(decform$Number[isoidx])
-  decform <- decform[-isoidx,]
-  
-  newiso <- isoeln-nisos
-  newiso <- sapply(newiso,function(x) { 
-    if(x>0){
-      paste0(isoel,x) 
-    }else{
-      ""
-    }
-  })
-  
-  varvec <- paste0(paste0(isos$element,nisos),newiso)
-  fixed <- paste(sapply(1:nrow(decform),function(x) paste0(decform[x,],collapse="")),collapse="")
-  
-  res <- paste0(varvec,fixed)
-  
-  res <- c(formula,res)
-  return(res)
+iso.generator <- function (formula, atom, nisos, isotopes) {
+	
+	#DETECT CHARGE I AFEGIR AL FINAL DESPRES DE FER ELS ISOS
+	isCharged <- F
+	if(grepl("(\\+)",formula)){
+		isCharged <- T
+		charge <- "+"
+		formula <- gsub("(\\+)","",formula)
+	}
+	
+	if(grepl("(\\-)",formula)){
+		isCharged <- T
+		charge <- "-"
+		formula <- gsub("(\\-)","",formula)
+	}
+	
+	isos <- isotopes[which(isotopes$isotope == atom), ]
+	isos <- isos[grep("\\[", isos$element), ]
+	isoel <- gsub("[0-9]", "", atom)
+	decform <- isoSCAN:::decompose.formula(formula)
+	isoidx <- which(decform$Element == isoel)
+	isoeln <- as.numeric(decform$Number[isoidx])
+	decform <- decform[-isoidx, ]
+	newiso <- isoeln - nisos
+	newiso <- sapply(newiso, function(x) {
+		if (x > 0) {
+			paste0(isoel, x)
+		}
+		else {
+			""
+		}
+	})
+	varvec <- paste0(paste0(isos$element, nisos), newiso)
+	fixed <- paste(sapply(1:nrow(decform), function(x) paste0(decform[x, 
+	], collapse = "")), collapse = "")
+	res <- paste0(varvec, fixed)
+	res <- c(formula, res)
+	if(isCharged){
+		res <- paste0(res,charge)
+	}
+	return(res)
 }
 
 countDecimalPlaces <- function(x) { 
